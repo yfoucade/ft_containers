@@ -1,0 +1,3 @@
+*.o
+containers
+test_vector
