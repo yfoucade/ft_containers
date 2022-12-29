@@ -1,7 +1,7 @@
 NAME = containers
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++11
 MMD = -MMD
 
 RM = rm -rf
@@ -30,6 +30,7 @@ fclean: clean
 
 re: fclean all
 
+#relinks
 test_vector:
 	${CXX} ${CXXFLAGS} -I. -o tests/test_vector.o -c tests/test_vector.cpp
 	${CXX} ${CXXFLAGS} -I. -o tests/$@ tests/test_vector.o
