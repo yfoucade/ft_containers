@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/31 23:44:08 by yfoucade         ###   ########.fr       */
+/*   Updated: 2022/12/31 23:55:51 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,17 +46,9 @@ class vector{
 							const T& value = value_type(),
 							const Allocator& alloc = allocator_type());
 		template< typename InputIt >
-		vector(	InputIt first,
-				typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last,
-				const allocator_type& alloc = allocator_type()):
-			_allocator(alloc)
-			{
-					_size = last - first;
-					_capacity = _size;
-					_tab = _allocator.allocate(_capacity);
-					for (InputIt tmp = first; tmp!= last; tmp++)
-						_tab[tmp - first] = static_cast<value_type>(*tmp);
-			}
+		vector(	InputIt,
+				typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type,
+				const allocator_type& = allocator_type());
 		vector( const vector& other );
 		vector& operator=( const vector& other );
 		~vector( void );
@@ -93,6 +85,20 @@ vector<T, Allocator>::vector(
 	for (size_type i = 0; i < count; i++)
 		_tab[i] = value;
 }
+
+template< typename T, typename Allocator >
+template< typename InputIt >
+vector<T, Allocator>::vector( InputIt first,
+		typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last,
+		const allocator_type& alloc ):
+	_allocator(alloc)
+	{
+		_size = last - first;
+		_capacity = _size;
+		_tab = _allocator.allocate(_capacity);
+		for (InputIt tmp = first; tmp!= last; tmp++)
+			_tab[tmp - first] = static_cast<value_type>(*tmp);
+	}
 
 template< typename T, typename Allocator >
 vector<T, Allocator>::vector( const vector& other ):
