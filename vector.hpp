@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/31 01:03:00 by yfoucade         ###   ########.fr       */
+/*   Updated: 2022/12/31 01:34:34 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,14 @@ class vector{
 		vector( const vector& other );
 		vector& operator=( const vector& other );
 		~vector( void );
-		iterator begin( void ) const;
-		iterator end( void ) const;
+		iterator begin( void );
+		const_iterator begin( void ) const;
+		iterator end( void );
+		const_iterator end( void ) const;
+		reverse_iterator rbegin( void );
+		const_reverse_iterator rbegin( void ) const;
+		reverse_iterator rend( void );
+		const_reverse_iterator rend( void ) const;
 };
 
 template < typename T, typename Allocator >
@@ -122,15 +128,51 @@ vector<T, Allocator>::~vector( void )
 }
 
 template< typename T, typename Allocator >
-typename vector<T, Allocator>::iterator vector<T, Allocator>::begin( void ) const
+typename vector<T, Allocator>::iterator vector<T, Allocator>::begin( void )
 {
 	return _tab;
 }
 
 template< typename T, typename Allocator >
-typename vector<T, Allocator>::iterator vector<T, Allocator>::end( void ) const
+typename vector<T, Allocator>::const_iterator vector<T, Allocator>::begin( void ) const
+{
+	return _tab;
+}
+
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::iterator vector<T, Allocator>::end( void )
 {
 	return _tab + _size;
 }
 
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::const_iterator vector<T, Allocator>::end( void ) const
+{
+	return _tab + _size;
 }
+
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::reverse_iterator vector<T, Allocator>::rbegin( void )
+{
+	return _tab + _size;
+}
+
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::const_reverse_iterator vector<T, Allocator>::rbegin( void ) const
+{
+	return _tab + _size;
+}
+
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::reverse_iterator vector<T, Allocator>::rend( void )
+{
+	return _tab;
+}
+
+template< typename T, typename Allocator >
+typename vector<T, Allocator>::const_reverse_iterator vector<T, Allocator>::rend( void ) const
+{
+	return _tab;
+}
+
+} // namespace ft
