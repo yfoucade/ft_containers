@@ -6,13 +6,13 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/29 23:12:09 by yfoucade         ###   ########.fr       */
+/*   Updated: 2022/12/31 01:03:00 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <memory>
+#include "ft_iterator.hpp"
 #include <type_traits> /* To be removed */
 
 namespace ft{
@@ -36,8 +36,8 @@ class vector{
 		typedef typename Allocator::const_pointer const_pointer;
 		typedef value_type* iterator;
 		typedef const value_type* const_iterator;
-		typedef std::reverse_iterator<iterator> reverse_iterator;
-		typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 		vector( void );
 		explicit vector( const Allocator& alloc );
@@ -133,37 +133,4 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::end( void ) const
 	return _tab + _size;
 }
 
-}
-
-
-namespace ft
-{
-	template< class Iter >
-	struct iterator_traits{
-		typedef Iter::difference_type difference_type;
-		typedef Iter::value_type value_type;
-		typedef Iter::pointer pointer;
-		typedef Iter::reference reference;
-		typedef Iter::iterator_category iterator_category;
-	};
-
-	template< class T >
-	struct iterator_traits<T*>
-	{
-		typedef std::ptrdiff_t difference_type;
-		typedef T value_type;
-		typedef T* pointer;
-		typedef T& reference;
-		typedef std::random_access_iterator_tag iterator_category;
-	};
-
-	template< class T >
-	struct iterator_traits<const T*>
-	{
-		typedef std::ptrdiff_t difference_type;
-		typedef T value_type;
-		typedef const T* pointer;
-		typedef const T& reference;
-		typedef std::random_access_iterator_tag iterator_category;
-	};
 }
