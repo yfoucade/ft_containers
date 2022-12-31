@@ -1,7 +1,7 @@
 NAME = containers
 
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++11
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 MMD = -MMD
 
 RM = rm -rf
