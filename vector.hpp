@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/31 22:46:38 by yfoucade         ###   ########.fr       */
+/*   Updated: 2022/12/31 23:44:08 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,10 @@ class vector{
 							const Allocator& alloc = allocator_type());
 		template< typename InputIt >
 		vector(	InputIt first,
-				InputIt last,
-				const allocator_type& alloc = allocator_type(),
-				typename ft::enable_if<!ft::is_integral<InputIt>::value>::type *a = NULL):
+				typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last,
+				const allocator_type& alloc = allocator_type()):
 			_allocator(alloc)
 			{
-					if (a){}
 					_size = last - first;
 					_capacity = _size;
 					_tab = _allocator.allocate(_capacity);
