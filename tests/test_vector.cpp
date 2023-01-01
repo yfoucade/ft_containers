@@ -6,13 +6,24 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 13:58:39 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/28 10:42:50 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/01 11:19:21 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <vector>
 #include "vector.hpp"
+
+void empty_vector(void)
+{
+	std::cout << "Creating empty std::vector<int>" << std::endl;
+	std::vector<int> v1;
+
+	std::cout << "v1.empty() = " << v1.empty() << std::endl;
+	std::cout << "v1.size() = " << v1.size() << std::endl;
+	std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+	std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+}
 
 void test_constructor(void){
 	std::vector<int> v1;
@@ -46,5 +57,6 @@ void test_constructor(void){
 }
 
 int main(void){
+	empty_vector();
 	test_constructor();
 }
