@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/01 17:41:18 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/01 22:28:59 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "iterator.hpp"
 #include "enable_if.hpp"
 #include "is_integral.hpp"
+#include "lexicographical_compare.hpp"
 #include <limits>
 
 namespace ft{
@@ -90,6 +91,16 @@ class vector{
 
 		// modifiers
 		void clear();
+		iterator insert( const_iterator pos, const T& value );
+		iterator insert( const_iterator pos, size_type count, const T& value );
+		template< class InputIt >
+		iterator insert( const_iterator pos, InputIt first, InputIt last );
+		iterator erase( iterator pos );
+		iterator erase( iterator first, iterator last );
+		void push_back( const T& value );
+		void pop_back();
+		void resize( size_type count );
+		void swap( vector& other );
 };
 
 template < typename T, typename Allocator >
@@ -251,14 +262,14 @@ typename vector<T, Allocator>::const_reference vector<T, Allocator>::back() cons
 template< typename T, typename Allocator >
 T* vector<T, Allocator>::data()
 {
-	if (!size())
+	if (!_size)
 		return NULL;
 	return _tab;
 }
 template< typename T, typename Allocator >
 const T* vector<T, Allocator>::data() const
 {
-	if (!size())
+	if (!_size)
 		return NULL;
 	return _tab;
 }
@@ -334,6 +345,8 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 {
 	if (new_cap > max_size())
 		throw (std::length_error());
+	if (new_cap <= _capacity)
+		return;
 	T* tmp = _allocator.allocate(new_cap);
 	_capacity = new_cap;
 	iterator start = begin();
@@ -356,6 +369,189 @@ void vector<T, Allocator>::clear()
 	for (int i = 0; i < _size; ++i)
 		_tab[i].~T();
 	_size = 0;
+}
+
+template< typename T, typename Allocator >
+vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, const T& value )
+{
+	return insert(pos, 1, value);
+}
+
+template< typename T, typename Allocator >
+vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, size_type count, const T& value )
+{
+	if (!count)
+		return pos;
+	reserve(_size + count);
+	T* start = _tab[_size - 1];
+	T* it = start;
+	T* end = _tab[pos - 1];
+	for (; it != end; --it)
+		it[count] = *it;
+	for (int i = 0; i < count; ++i)
+		_tab[i + pos] = T(value);
+	return _tab + pos;
+}
+
+template< typename T, typename Allocator >
+template< class InputIt >
+vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, InputIt first, InputIt last )
+{
+	if (last == first)
+		return pos;
+	size_type count = static_cast<size_type>(last - first);
+	reserve(_size + count);
+	T* start = _tab[_size - 1];
+	T* it = start;
+	T* end = _tab[pos - 1];
+	for (; it != end; --it)
+		it[count] = *it;
+	for (InputIt it = start; it != end; ++it)
+		_tab[pos + (it - start)] = T(*it);
+	return _tab + pos;
+}
+
+template< typename T, typename Allocator >
+vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
+{
+	_tab[pos].~T();
+	--_size;
+	iterator it = pos;
+	iterator ret = it;
+	iterator end = end();
+	while (++it != end)
+		*pos++ = *it;
+	return ret;
+}
+
+template< typename T, typename Allocator >
+vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator first, iterator last )
+{
+	if (first == last)
+		return last;
+	iterator it = first;
+	iterator ret = it;
+	iterator end = end();
+	while (it != last)
+	{
+		it++->~T();
+		--_size;
+	}
+	it = first;
+	while (last != end)
+		*it++ = *last++;
+	return ret;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::push_back( const T& value )
+{
+	reserve(_size + 1);
+	_tab[++_size] = value;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::pop_back()
+{
+	_tab[_size - 1].~T();
+	--_size;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::resize( size_type count )
+{
+	reserve(count);
+	if (_size < count)
+	{
+		for (size_type i = _size; i < count; ++i)
+			_tab[i] = T();
+	}
+	else
+	{
+		for (size_type i = count; i < _size; ++i)
+			_tab[i].~T();
+	}
+	_size = count;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::swap( vector& other )
+{
+	allocator_type tmp_allocator = _allocator;
+	size_type tmp_size = _size, tmp_capacity = _capacity;
+	T* tmp_tab = _tab;
+
+	_allocator = other._allocator;
+	_size = other._size;
+	_capacity = other._capacity;
+	_tab = other._tab;
+
+	other._allocator = tmp_allocator;
+	other._size = tmp_size;
+	other._capacity = tmp_capacity;
+	other._tab = tmp_tab;
+}
+
+} // namespace ft
+
+namespace ft
+{
+
+template< class T, class Alloc >
+bool operator==(	const std::vector<T,Alloc>& lhs,
+					const std::vector<T,Alloc>& rhs )
+{
+	typename vector<T, Alloc>::iterator first1 = lhs.begin(), last1 = lhs.end();
+	typename vector<T, Alloc>::iterator first2 = rhs.begin(), last2 = rhs.end();
+
+	if (lhs.size() != rhs.size())
+		return false;
+	while ((first1 != last1) && (first2 != last2))
+		if (*first1++ != *first2++)
+			return false;
+	return (first1 == last1) && (first2 == last2);
+}
+
+template< class T, class Alloc >
+bool operator!=(	const std::vector<T,Alloc>& lhs,
+					const std::vector<T,Alloc>& rhs )
+{
+	return !(lhs == rhs);
+}
+
+template< class T, class Alloc >
+bool operator<(	const std::vector<T,Alloc>& lhs,
+				const std::vector<T,Alloc>& rhs )
+{
+	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template< class T, class Alloc >
+bool operator<=(	const std::vector<T,Alloc>& lhs,
+					const std::vector<T,Alloc>& rhs )
+{
+	return !(rhs < lhs);
+}
+
+template< class T, class Alloc >
+bool operator>(	const std::vector<T,Alloc>& lhs,
+				const std::vector<T,Alloc>& rhs )
+{
+	return (rhs < lhs);
+}
+
+template< class T, class Alloc >
+bool operator>=(	const std::vector<T,Alloc>& lhs,
+					const std::vector<T,Alloc>& rhs )
+{
+	return !(lhs < rhs);
+}
+
+template< class T, class Alloc >
+void swap(	std::vector<T,Alloc>& lhs,
+			std::vector<T,Alloc>& rhs )
+{
+	lhs.swap(rhs);
 }
 
 } // namespace ft
