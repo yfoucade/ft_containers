@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/01 17:32:52 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/01 17:41:18 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,9 @@ class vector{
 		size_type max_size() const;
 		void reserve( size_type new_cap );
 		size_type capacity() const;
+
+		// modifiers
+		void clear();
 };
 
 template < typename T, typename Allocator >
@@ -345,6 +348,14 @@ template< typename T, typename Allocator >
 typename vector<T, Allocator>::size_type vector<T, Allocator>::capacity() const
 {
 	return _capacity;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::clear()
+{
+	for (int i = 0; i < _size; ++i)
+		_tab[i].~T();
+	_size = 0;
 }
 
 } // namespace ft
