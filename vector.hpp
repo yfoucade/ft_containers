@@ -6,15 +6,16 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/01 17:23:46 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/01 17:32:52 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "ft_iterator.hpp"
-#include "ft_enable_if.hpp"
-#include "ft_is_integral.hpp"
+#include "iterator.hpp"
+#include "enable_if.hpp"
+#include "is_integral.hpp"
+#include <limits>
 
 namespace ft{
 
@@ -189,57 +190,57 @@ void vector<T, Allocator>::assign( InputIt first, InputIt last )
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::allocator_type vector<T, Allocator>::get_allocator( void ) const
+typename vector<T, Allocator>::allocator_type vector<T, Allocator>::get_allocator( void ) const
 {
 	return _allocator;
 }
 
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::reference vector<T, Allocator>::at( size_type pos )
+typename vector<T, Allocator>::reference vector<T, Allocator>::at( size_type pos )
 {
 	if (!(pos < size()))
-		throw (std::out_of_range);
+		throw (std::out_of_range());
 	return _tab + pos;
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::const_reference vector<T, Allocator>::at( size_type pos ) const
+typename vector<T, Allocator>::const_reference vector<T, Allocator>::at( size_type pos ) const
 {
 	if (!(pos < size()))
-		throw (std::out_of_range);
+		throw (std::out_of_range());
 	return _tab + pos;
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::reference vector<T, Allocator>::operator[]( size_type pos )
+typename vector<T, Allocator>::reference vector<T, Allocator>::operator[]( size_type pos )
 {
 	return _tab + pos;
 }
 template< typename T, typename Allocator >
-vector<T, Allocator>::const_reference vector<T, Allocator>::operator[]( size_type pos ) const
+typename vector<T, Allocator>::const_reference vector<T, Allocator>::operator[]( size_type pos ) const
 {
 	return _tab + pos;
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator >::reference vector<T, Allocator>::front( void )
+typename vector<T, Allocator >::reference vector<T, Allocator>::front( void )
 {
 	return _tab;
 }
 template< typename T, typename Allocator >
-vector<T, Allocator >::const_reference vector<T, Allocator>::front( void ) const
+typename vector<T, Allocator >::const_reference vector<T, Allocator>::front( void ) const
 {
 	return _tab;
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::reference vector<T, Allocator>::back()
+typename vector<T, Allocator>::reference vector<T, Allocator>::back()
 {
 	return _tab + _size - 1;
 }
 template< typename T, typename Allocator >
-vector<T, Allocator>::const_reference vector<T, Allocator>::back() const
+typename vector<T, Allocator>::const_reference vector<T, Allocator>::back() const
 {
 	return _tab + _size - 1;
 }
@@ -314,13 +315,13 @@ bool vector<T, Allocator>::empty() const
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::size_type vector<T, Allocator>::size() const
+typename vector<T, Allocator>::size_type vector<T, Allocator>::size() const
 {
 	return _size;
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::size_type vector<T, Allocator>::max_size() const
+typename vector<T, Allocator>::size_type vector<T, Allocator>::max_size() const
 {
 	return std::numeric_limits<difference_type>::max();
 }
@@ -329,7 +330,7 @@ template< typename T, typename Allocator >
 void vector<T, Allocator>::reserve( size_type new_cap )
 {
 	if (new_cap > max_size())
-		throw (std::length_error);
+		throw (std::length_error());
 	T* tmp = _allocator.allocate(new_cap);
 	_capacity = new_cap;
 	iterator start = begin();
@@ -341,7 +342,7 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::size_type vector<T, Allocator>::capacity() const
+typename vector<T, Allocator>::size_type vector<T, Allocator>::capacity() const
 {
 	return _capacity;
 }
