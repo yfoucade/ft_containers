@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/01 22:28:59 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/01 22:32:36 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -372,13 +372,13 @@ void vector<T, Allocator>::clear()
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, const T& value )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, const T& value )
 {
 	return insert(pos, 1, value);
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, size_type count, const T& value )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, size_type count, const T& value )
 {
 	if (!count)
 		return pos;
@@ -395,7 +395,7 @@ vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos,
 
 template< typename T, typename Allocator >
 template< class InputIt >
-vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, InputIt first, InputIt last )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, InputIt first, InputIt last )
 {
 	if (last == first)
 		return pos;
@@ -412,7 +412,7 @@ vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos,
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
 {
 	_tab[pos].~T();
 	--_size;
@@ -425,7 +425,7 @@ vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
 }
 
 template< typename T, typename Allocator >
-vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator first, iterator last )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator first, iterator last )
 {
 	if (first == last)
 		return last;
