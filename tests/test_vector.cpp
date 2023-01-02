@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 13:58:39 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/02 15:44:52 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/02 16:52:56 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,42 @@ void constructor_alloc( void )
 		std::cout << v1[0] << " " << std::endl;
 		std::cout << sizeof(v1.data()[0]) << std::endl;
 		std::cout << std::endl;
-		
+	}
+	{
+		std::cout << "Alloc constructor std::vector<int>(std::allocator<char>)\n";
+		std::allocator<int> alloc;
+		std::vector<char, std::allocator<int> > v1(alloc);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// std::cout << "v1.data() = " << v1.data() << std::endl;
+		v1.push_back(42);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0] << " " << std::endl;
+		std::cout << sizeof(v1.data()[0]) << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "Alloc constructor ft::vector<int>(std::allocator<char>)\n";
+		std::allocator<int> alloc;
+		ft::vector<char, std::allocator<int> > v1(alloc);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// std::cout << "v1.data() = " << v1.data() << std::endl;
+		v1.push_back(42);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0] << " " << std::endl;
+		std::cout << sizeof(v1.data()[0]) << std::endl;
+		std::cout << std::endl;
 	}
 }
 
