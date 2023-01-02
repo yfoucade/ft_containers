@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/01 22:32:36 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/02 16:23:16 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "is_integral.hpp"
 #include "lexicographical_compare.hpp"
 #include <limits>
+#include <memory>
 
 namespace ft{
 
@@ -27,6 +28,7 @@ class vector{
 		std::size_t _size;
 		std::size_t _capacity;
 		T* _tab;
+		T* allocate_capacity(std::size_t target);
 
 	public:
 		typedef T value_type;
@@ -104,14 +106,18 @@ class vector{
 };
 
 template < typename T, typename Allocator >
-vector<T, Allocator>::vector( void ):_size(0), _tab(_allocator.allocate(0)){}
+vector<T, Allocator>::vector( void ):_size(0), _capacity(0), _tab(NULL){}
 
 template < typename T, typename Allocator >
-vector<T, Allocator>::vector( const allocator_type& alloc ):
+vector<T, Allocator>::vector( const Allocator& alloc ):
 			_allocator(alloc),
 			_size(0),
 			_capacity(0),
-			_tab(_allocator.allocate(0)){}
+			_tab(NULL)
+{
+	std::cout << "Alloc constructor called with type of size: ";
+	std::cout << sizeof(typename Allocator::value_type) << std::endl;
+}
 
 template < typename T, typename Allocator >
 vector<T, Allocator>::vector(
@@ -229,7 +235,7 @@ typename vector<T, Allocator>::const_reference vector<T, Allocator>::at( size_ty
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::reference vector<T, Allocator>::operator[]( size_type pos )
 {
-	return _tab + pos;
+	return *(_tab + pos);
 }
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reference vector<T, Allocator>::operator[]( size_type pos ) const
@@ -337,22 +343,22 @@ typename vector<T, Allocator>::size_type vector<T, Allocator>::size() const
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::size_type vector<T, Allocator>::max_size() const
 {
-	return std::numeric_limits<difference_type>::max();
+	return std::numeric_limits<difference_type>::max() / sizeof(T);
 }
 
 template< typename T, typename Allocator >
 void vector<T, Allocator>::reserve( size_type new_cap )
 {
 	if (new_cap > max_size())
-		throw (std::length_error());
+		throw (std::length_error("Cannot allocate more than max_size()"));
 	if (new_cap <= _capacity)
 		return;
-	T* tmp = _allocator.allocate(new_cap);
+	T* tmp = reinterpret_cast<T*>(allocate_capacity(new_cap));
 	_capacity = new_cap;
-	iterator start = begin();
-	iterator end = end();
-	for (iterator it = start; it < end; ++it)
-		tmp[it - start] = T(*it);
+	iterator first = begin();
+	iterator last = end();
+	for (iterator it = first; it < last; ++it)
+		tmp[it - first] = T(*it);
 	delete _tab;
 	_tab = tmp;
 }
@@ -447,7 +453,7 @@ template< typename T, typename Allocator >
 void vector<T, Allocator>::push_back( const T& value )
 {
 	reserve(_size + 1);
-	_tab[++_size] = value;
+	_tab[_size++] = value;
 }
 
 template< typename T, typename Allocator >
@@ -494,12 +500,34 @@ void vector<T, Allocator>::swap( vector& other )
 
 } // namespace ft
 
+// private member functions
+namespace ft
+{
+template< typename T, typename Allocator >
+T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
+{
+	std::size_t required = target_capacity * sizeof(T);
+	std::size_t marginal = sizeof(typename Allocator::value_type);
+	std::size_t n_elem = 0;
+	while (marginal * n_elem < required)
+		n_elem = (n_elem << 1) + 1;
+	std::size_t tot = marginal * n_elem;
+	std::size_t remove = 0;
+	while (tot - remove > required)
+	{
+		++remove;
+		tot -= marginal;
+	}
+	return reinterpret_cast<T*>(_allocator.allocate(n_elem - remove));
+}
+} // namespace ft
+
 namespace ft
 {
 
 template< class T, class Alloc >
-bool operator==(	const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs )
+bool operator==(	const ft::vector<T,Alloc>& lhs,
+					const ft::vector<T,Alloc>& rhs )
 {
 	typename vector<T, Alloc>::iterator first1 = lhs.begin(), last1 = lhs.end();
 	typename vector<T, Alloc>::iterator first2 = rhs.begin(), last2 = rhs.end();
@@ -513,43 +541,43 @@ bool operator==(	const std::vector<T,Alloc>& lhs,
 }
 
 template< class T, class Alloc >
-bool operator!=(	const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs )
+bool operator!=(	const ft::vector<T,Alloc>& lhs,
+					const ft::vector<T,Alloc>& rhs )
 {
 	return !(lhs == rhs);
 }
 
 template< class T, class Alloc >
-bool operator<(	const std::vector<T,Alloc>& lhs,
-				const std::vector<T,Alloc>& rhs )
+bool operator<(	const ft::vector<T,Alloc>& lhs,
+				const ft::vector<T,Alloc>& rhs )
 {
 	return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 template< class T, class Alloc >
-bool operator<=(	const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs )
+bool operator<=(	const ft::vector<T,Alloc>& lhs,
+					const ft::vector<T,Alloc>& rhs )
 {
 	return !(rhs < lhs);
 }
 
 template< class T, class Alloc >
-bool operator>(	const std::vector<T,Alloc>& lhs,
-				const std::vector<T,Alloc>& rhs )
+bool operator>(	const ft::vector<T,Alloc>& lhs,
+				const ft::vector<T,Alloc>& rhs )
 {
 	return (rhs < lhs);
 }
 
 template< class T, class Alloc >
-bool operator>=(	const std::vector<T,Alloc>& lhs,
-					const std::vector<T,Alloc>& rhs )
+bool operator>=(	const ft::vector<T,Alloc>& lhs,
+					const ft::vector<T,Alloc>& rhs )
 {
 	return !(lhs < rhs);
 }
 
 template< class T, class Alloc >
-void swap(	std::vector<T,Alloc>& lhs,
-			std::vector<T,Alloc>& rhs )
+void swap(	ft::vector<T,Alloc>& lhs,
+			ft::vector<T,Alloc>& rhs )
 {
 	lhs.swap(rhs);
 }
