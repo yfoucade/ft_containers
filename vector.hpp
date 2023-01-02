@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/02 16:23:16 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/02 16:51:24 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -513,7 +513,7 @@ T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
 		n_elem = (n_elem << 1) + 1;
 	std::size_t tot = marginal * n_elem;
 	std::size_t remove = 0;
-	while (tot - remove > required)
+	while (tot - marginal > required)
 	{
 		++remove;
 		tot -= marginal;
