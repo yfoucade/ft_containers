@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/02 16:51:24 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/03 10:23:03 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ vector<T, Allocator>::vector(
 	_allocator(alloc),
 	_size(count),
 	_capacity(count),
-	_tab(_allocator.allocate(_capacity))
+	_tab(allocate_capacity(_capacity))
 {
 	for (size_type i = 0; i < count; i++)
 		_tab[i] = T(value);
@@ -353,7 +353,7 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 		throw (std::length_error("Cannot allocate more than max_size()"));
 	if (new_cap <= _capacity)
 		return;
-	T* tmp = reinterpret_cast<T*>(allocate_capacity(new_cap));
+	T* tmp = (allocate_capacity(new_cap));
 	_capacity = new_cap;
 	iterator first = begin();
 	iterator last = end();
@@ -452,7 +452,15 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 template< typename T, typename Allocator >
 void vector<T, Allocator>::push_back( const T& value )
 {
-	reserve(_size + 1);
+	if (_size == _capacity)
+	{
+		if (_capacity == max_size())
+			throw (std::length_error("Cannot allocate more than max_size()"));
+		if (!_capacity)
+			reserve(1);
+		else
+			reserve(_capacity > (max_size() >> 1) ? max_size() : 2 * _capacity);
+	}
 	_tab[_size++] = value;
 }
 
@@ -503,23 +511,24 @@ void vector<T, Allocator>::swap( vector& other )
 // private member functions
 namespace ft
 {
+
 template< typename T, typename Allocator >
 T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
 {
-	std::size_t required = target_capacity * sizeof(T);
-	std::size_t marginal = sizeof(typename Allocator::value_type);
-	std::size_t n_elem = 0;
-	while (marginal * n_elem < required)
-		n_elem = (n_elem << 1) + 1;
-	std::size_t tot = marginal * n_elem;
-	std::size_t remove = 0;
-	while (tot - marginal > required)
-	{
-		++remove;
-		tot -= marginal;
-	}
-	return reinterpret_cast<T*>(_allocator.allocate(n_elem - remove));
+	/*
+	Args:
+		target_capacity: the number of type T objects we want to be able to store.
+	Returns:
+		T*: a pointer to the start of the allocated array.
+	*/
+	std::size_t required_size = target_capacity * sizeof(T);
+	std::size_t n_elem = required_size / sizeof(typename Allocator::value_type);
+	if (n_elem * sizeof(typename Allocator::value_type) < required_size)
+		++n_elem;
+	std::cout << "Allocating " << n_elem << " elements\n";
+	return reinterpret_cast<T*>(_allocator.allocate(n_elem));
 }
+
 } // namespace ft
 
 namespace ft
