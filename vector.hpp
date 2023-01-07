@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 12:26:11 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 13:15:17 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class vector{
 		std::size_t _capacity;
 		T* _tab;
 		T* allocate_capacity(std::size_t target);
+		std::size_t get_alloc_size( std::size_t capacity );
 
 	public:
 		typedef T value_type;
@@ -177,6 +178,8 @@ vector<T, Allocator>& vector<T, Allocator>::operator=( const vector& other )
 template< typename T, typename Allocator >
 vector<T, Allocator>::~vector( void )
 {
+	if (!_tab)
+		return;
 	size_type i = _size;
 	iterator it = begin();
 	while (i)
@@ -186,7 +189,7 @@ vector<T, Allocator>::~vector( void )
 	}
 	// Have a function that computes the number of elements to deallocate,
 	// or save it in a data member.m	
-	_allocator.deallocate(reinterpret_cast<typename Allocator::pointer>(_tab), _capacity);
+	_allocator.deallocate(reinterpret_cast<typename Allocator::pointer>(_tab), get_alloc_size(_capacity));
 }
 
 template< typename T, typename Allocator >
@@ -532,15 +535,20 @@ T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
 	*/
 	if (target_capacity == 0)
 		return NULL;
-	size_type required_size = target_capacity * sizeof(T);
+	size_type n_elem = get_alloc_size(target_capacity);
+	T* ret = reinterpret_cast<T*>(_allocator.allocate(n_elem));
+	std::memset(reinterpret_cast<void*>(ret), 0, n_elem * sizeof(typename Allocator::value_type));
+	return ret;
+}
+
+template< typename T, typename Allocator >
+std::size_t vector<T, Allocator>::get_alloc_size( std::size_t capacity )
+{
+	size_type required_size = capacity * sizeof(T);
 	size_type n_elem = required_size / sizeof(typename Allocator::value_type);
 	if (n_elem * sizeof(typename Allocator::value_type) < required_size)
 		++n_elem;
-	std::cout << "allocate_capacity: Allocating " << n_elem << " elements\n";
-	T* ret = reinterpret_cast<T*>(_allocator.allocate(n_elem));
-	std::memset(reinterpret_cast<void*>(ret), 0, n_elem * sizeof(typename Allocator::value_type));
-	std::cout << "allocate_capacity: done\n";
-	return ret;
+	return n_elem;
 }
 
 } // namespace ft
