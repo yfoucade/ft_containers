@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:01:21 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 15:22:21 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/08 00:29:50 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,13 @@
 #include "pair.hpp"
 
 template< typename Container >
-void print_content( Container c, char sep = ' ' );
+void	print_content( Container c, char sep = ' ' );
 void	test_constructors( void );
+void	test_access( void );
+void	test_iterators( void );
+ft::vector< int > range_vector(int min, int max);
+void	test_capacity( void );
+void	test_modifiers( void );
 
 template< typename Container >
 void print_content( Container c, char sep )
@@ -29,4 +34,16 @@ void print_content( Container c, char sep )
 	while (start != end)
 		std::cout << *start++ << sep;
 	std::cout << "\n";
+}
+
+template < typename T >
+void test_const_access( const ft::vector< T > v )
+{
+	std::cout << "vector = {0, 1, 2, 3, 4}\n";
+	std::cout << "v.at(1) = " << v.at(1) << std::endl;
+	std::cout << "v[2] = " << v[2] << std::endl;
+	std::cout << "v.front() = " << v.front() << std::endl;
+	std::cout << "v.back() = " << v.back() << std::endl;
+	std::cout << "*(v.data() + 3) = " << *(v.data() + 3) << std::endl;
+	std::cout << std::endl;
 }
