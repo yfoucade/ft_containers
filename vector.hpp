@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 17:06:46 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 17:59:35 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,8 +191,8 @@ template< typename T, typename Allocator >
 void vector<T, Allocator>::assign( size_type count, const T& value )
 {
 	destroy_tab_elements();
+	reserve(count);
 	_size = count;
-	reserve(_size);
 	for (size_type i = 0; i < count; ++i)
 		_tab[i] = value;
 }
@@ -202,8 +202,8 @@ template< class InputIt >
 void vector<T, Allocator>::assign( InputIt first, InputIt last )
 {
 	destroy_tab_elements();
+	reserve(last - first);
 	_size = last - first;
-	reserve(_size);
 	for (InputIt tmp = first; tmp != last; ++tmp)
 		_tab[tmp - first] = *tmp;
 }
@@ -356,7 +356,7 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 	iterator first = begin();
 	iterator last = end();
 	for (iterator it = first; it < last; ++it)
-		tmp[it - first] = T(*it);
+		tmp[it - first] = *it;
 	this->~vector();
 	_capacity = new_cap;
 	_tab = tmp;
