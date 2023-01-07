@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/03 10:23:03 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 12:26:11 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "lexicographical_compare.hpp"
 #include <limits>
 #include <memory>
+#include <cstring>
 
 namespace ft{
 
@@ -142,42 +143,50 @@ vector<T, Allocator>::vector( InputIt first,
 	{
 		_size = last - first;
 		_capacity = _size;
-		_tab = _allocator.allocate(_capacity);
+		_tab = allocate_capacity(_capacity);
 		for (InputIt tmp = first; tmp!= last; tmp++)
-			_tab[tmp - first] = T(*tmp);
+			_tab[tmp - first] = *tmp;
 	}
 
 template< typename T, typename Allocator >
 vector<T, Allocator>::vector( const vector& other ):
-_tab(_allocator.allocate(0))
+_size(0),
+_tab(NULL)
 {
-	std::cout << "Called copy constructor" << std::endl;
 	*this = other;
 }
 
 template< typename T, typename Allocator >
 vector<T, Allocator>& vector<T, Allocator>::operator=( const vector& other )
 {
-	std::cout << "Called assignment operator" << std::endl;
 	if ( this == &other )
 		return *this;
-	delete _tab;
+	this->~vector();
 	_allocator = other._allocator;
 	_size = other._size;
 	_capacity = other._capacity;
 	_tab = _allocator.allocate(_capacity);
-	const_iterator start = other.begin();
+	const_iterator first = other.begin();
 	const_iterator it;
-	const_iterator end = other.end();
-	for ( it = start; it < end; it++ )
-		_tab[it - start] = *it;
+	const_iterator last = other.end();
+	for ( it = first; it < last; it++ )
+		_tab[it - first] = *it;
 	return *this;
 }
 
 template< typename T, typename Allocator >
 vector<T, Allocator>::~vector( void )
 {
-	delete _tab;
+	size_type i = _size;
+	iterator it = begin();
+	while (i)
+	{
+		--i;
+		(it++)->~T();
+	}
+	// Have a function that computes the number of elements to deallocate,
+	// or save it in a data member.m	
+	_allocator.deallocate(reinterpret_cast<typename Allocator::pointer>(_tab), _capacity);
 }
 
 template< typename T, typename Allocator >
@@ -185,7 +194,7 @@ void vector<T, Allocator>::assign( size_type count, const T& value )
 {
 	if (_capacity < count)
 	{
-		delete _tab;
+		this->~vector();
 		_capacity = count;
 		_tab = _allocator.allocate(_capacity);
 	}
@@ -200,7 +209,7 @@ void vector<T, Allocator>::assign( InputIt first, InputIt last )
 {
 	if (_capacity < last - first)
 	{
-		delete _tab;
+		this->~vector();
 		_capacity = last - first;
 		_tab = _allocator.allocate(_capacity);
 	}
@@ -354,12 +363,12 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 	if (new_cap <= _capacity)
 		return;
 	T* tmp = (allocate_capacity(new_cap));
-	_capacity = new_cap;
 	iterator first = begin();
 	iterator last = end();
 	for (iterator it = first; it < last; ++it)
 		tmp[it - first] = T(*it);
-	delete _tab;
+	this->~vector();
+	_capacity = new_cap;
 	_tab = tmp;
 }
 
@@ -521,12 +530,17 @@ T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
 	Returns:
 		T*: a pointer to the start of the allocated array.
 	*/
-	std::size_t required_size = target_capacity * sizeof(T);
-	std::size_t n_elem = required_size / sizeof(typename Allocator::value_type);
+	if (target_capacity == 0)
+		return NULL;
+	size_type required_size = target_capacity * sizeof(T);
+	size_type n_elem = required_size / sizeof(typename Allocator::value_type);
 	if (n_elem * sizeof(typename Allocator::value_type) < required_size)
 		++n_elem;
-	std::cout << "Allocating " << n_elem << " elements\n";
-	return reinterpret_cast<T*>(_allocator.allocate(n_elem));
+	std::cout << "allocate_capacity: Allocating " << n_elem << " elements\n";
+	T* ret = reinterpret_cast<T*>(_allocator.allocate(n_elem));
+	std::memset(reinterpret_cast<void*>(ret), 0, n_elem * sizeof(typename Allocator::value_type));
+	std::cout << "allocate_capacity: done\n";
+	return ret;
 }
 
 } // namespace ft
