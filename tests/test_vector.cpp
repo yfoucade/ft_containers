@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 13:58:39 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/03 10:14:30 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/05 23:19:40 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void constructor_default(void)
 		std::cout << "v2.size() = " << v2.size() << std::endl;
 		std::cout << "v2.max_size() = " << v2.max_size() << std::endl;
 		std::cout << "v2.capacity() = " << v2.capacity() << std::endl;
-		std::cout << "v2.data() = " << v2.data() << std::endl;
+		// std::cout << "v2.data() = " << v2.data() << std::endl;
 		std::cout << std::endl;
 	}
 	{
@@ -47,7 +47,8 @@ void constructor_default(void)
 		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
 		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
 		std::cout << std::endl;
-
+	}
+	{
 		std::cout << "Default constructor for ft::vector<char>" << std::endl;
 		ft::vector<char> v2;
 
@@ -55,6 +56,7 @@ void constructor_default(void)
 		std::cout << "v2.size() = " << v2.size() << std::endl;
 		std::cout << "v2.max_size() = " << v2.max_size() << std::endl;
 		std::cout << "v2.capacity() = " << v2.capacity() << std::endl;
+		// std::cout << "v1.data() = " << v2.data() << std::endl;
 		std::cout << std::endl;
 	}
 	{
@@ -190,7 +192,7 @@ void test_constructor(void){
 void constructor_count_value( void )
 {
 	{
-		std::cout << "Alloc constructor std::vector<int>(0, 42)\n";
+		std::cout << "Constructor count_value std::vector<int>(0, 42)\n";
 		std::vector<int, std::allocator<char> > v1(0, 42);
 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
 		std::cout << "v1.size() = " << v1.size() << std::endl;
@@ -207,7 +209,7 @@ void constructor_count_value( void )
 		std::cout << std::endl;
 	}
 	{
-		std::cout << "Alloc constructor ft::vector<int>(0, 42)\n";
+		std::cout << "Constructor count_value ft::vector<int>(0, 42)\n";
 		ft::vector<int, std::allocator<char> > v1(0, 42);
 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
 		std::cout << "v1.size() = " << v1.size() << std::endl;
@@ -224,7 +226,7 @@ void constructor_count_value( void )
 		std::cout << std::endl;
 	}
 	{
-		std::cout << "Alloc constructor std::vector<int>(5, 42)\n";
+		std::cout << "Constructor count_value std::vector<int>(5, 42)\n";
 		std::vector<int, std::allocator<char> > v1(5, 42);
 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
 		std::cout << "v1.size() = " << v1.size() << std::endl;
@@ -241,7 +243,7 @@ void constructor_count_value( void )
 		std::cout << std::endl;
 	}
 	{
-		std::cout << "Alloc constructor ft::vector<int>(5, 42)\n";
+		std::cout << "Constructor count_value ft::vector<int>(5, 42)\n";
 		ft::vector<int, std::allocator<char> > v1(5, 42);
 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
 		std::cout << "v1.size() = " << v1.size() << std::endl;
@@ -259,9 +261,168 @@ void constructor_count_value( void )
 	}
 }
 
+void constructor_iterator( void )
+{
+	int tab_int[] = {3, 14, 15, 92, 65};
+	{
+		std::cout << "Iterator constructor std::vector<int>(tab_int, tab_int+4)\n";
+		std::vector<int, std::allocator<char> > v1(tab_int, tab_int+4);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// push_back doubles the _capacity when vector is full.
+		v1.push_back(42);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0] << " " << std::endl;
+		std::cout << sizeof(v1.data()[0]) << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "Iterator constructor ft::vector<int>(tab_int, tab_int+4)\n";
+		ft::vector<int, std::allocator<char> > v1(tab_int, tab_int+4);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// should double capacity;
+		// v1.push_back(42);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0] << " " << std::endl;
+		std::cout << sizeof(v1.data()[0]) << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::vector<int> tab_vec[] = {std::vector<int>(), std::vector<int>()};
+		std::cout << "Iterator constructor std::vector<std::vector<int>>(tab_int, tab_int+4)\n";
+		std::vector<std::vector<int>, std::allocator<char> > v1(tab_vec, tab_vec+2);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// push_back doubles the _capacity when vector is full.
+		v1.push_back(std::vector<int>());
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0].data() << " " << std::endl;
+		std::cout << sizeof(v1.data()[0]) << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		ft::vector<int> tab_vec[] = {ft::vector<int>(), ft::vector<int>()};
+		std::cout << "Iterator constructor ft::vector<ft::vector<int> >(tab_vec, tab_vec+2)\n";
+		ft::vector<ft::vector<int>, std::allocator<char> > v1(tab_vec, tab_vec+2);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// should double capacity;
+		v1.push_back(ft::vector<int>());
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0].data() << " " << std::endl;
+		std::cout << v1.data() << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::vector<int> a(5, 21);
+		std::vector<int> b(5, 42);
+		std::vector<int> c;
+		std::vector<int> tab_vec[] = {a, b};
+		std::cout << "Iterator constructor std::vector<std::vector<int>>(tab_int, tab_int+4)\n";
+		std::vector<std::vector<int>, std::allocator<char> > v1(tab_vec, tab_vec+2);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		// push_back doubles the _capacity when vector is full.
+		v1.push_back(c);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0].data() << " " << std::endl;
+		std::cout << v1.data() << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		ft::vector<int> a(5, 21);
+		ft::vector<int> b(5, 42);
+		ft::vector<int> c;
+		ft::vector<int> tab_vec[] = {a, b};
+		std::cout << "Iterator constructor ft::vector<ft::vector<int> >(tab_int, tab_int+4)\n";
+		ft::vector<ft::vector<int>, std::allocator<char> > v1(tab_vec, tab_vec+2);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0].data() << " " << std::endl;
+		std::cout << v1.data() << std::endl;
+		// should double capacity;
+		// v1.push_back(c);
+		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << v1[0].data() << " " << std::endl;
+		std::cout << v1.data() << std::endl;
+		std::cout << std::endl;
+	}
+}
+
+// void constructor_copy( void )
+// {
+// 	{
+// 		std::cout << "Iterator constructor std::vector<std::vector<int>>(tab_int, tab_int+4)\n";
+// 		std::vector<std::vector<int>, std::allocator<char> > v1(tab_stdvec, tab_stdvec);
+// 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+// 		std::cout << "v1.size() = " << v1.size() << std::endl;
+// 		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+// 		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+// 		// push_back doubles the _capacity when vector is full.
+// 		v1.push_back(std::vector<int>());
+// 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+// 		std::cout << "v1.size() = " << v1.size() << std::endl;
+// 		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+// 		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+// 		std::cout << v1[0].data() << " " << std::endl;
+// 		std::cout << sizeof(v1.data()[0]) << std::endl;
+// 		std::cout << std::endl;
+// 	}
+// 	{
+// 		std::cout << "Iterator constructor ft::vector<ft::vector<int> >(tab_int, tab_int+4)\n";
+// 		ft::vector<ft::vector<int>, std::allocator<char> > v1(tab_ftvec, tab_ftvec);
+// 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+// 		std::cout << "v1.size() = " << v1.size() << std::endl;
+// 		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+// 		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+// 		// should double capacity;
+// 		v1.push_back(ft::vector<int>());
+// 		std::cout << "v1.empty() = " << v1.empty() << std::endl;
+// 		std::cout << "v1.size() = " << v1.size() << std::endl;
+// 		std::cout << "v1.max_size() = " << v1.max_size() << std::endl;
+// 		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+// 		std::cout << v1[0].data() << " " << std::endl;
+// 		std::cout << sizeof(v1.data()[0]) << std::endl;
+// 		std::cout << std::endl;
+// 	}
+// }
+
 int main(void){
 	constructor_default();
 	constructor_alloc();
 	constructor_count_value();
+	constructor_iterator();
+	// constructor_copy();
 	// test_constructor();
 }
