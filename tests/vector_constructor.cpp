@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:20:17 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 15:22:01 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 17:21:01 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -389,6 +389,92 @@ void constructor_copy( void )
 	}
 }
 
+void	test_assignment_operator( void )
+{
+	{
+		std::cout << "Assignment operator [std]\n";
+		std::vector< char > v_tmp(4, 'c');
+		std::vector< char > v1;
+
+		print_content(v_tmp);
+		print_content(v1);
+		v1 = v_tmp;
+		print_content(v1);
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "Assignment operator [ft]\n";
+		ft::vector< char > v_tmp(4, 'c');
+		ft::vector< char > v1;
+
+		print_content(v_tmp);
+		print_content(v1);
+		v1 = v_tmp;
+		print_content(v1);
+		std::cout << std::endl;
+	}
+}
+
+void	test_assign_count_value( void )
+{
+	{
+		// test whether a new storage is systematically allocated
+		std::cout << "Assign member function [std]\n";
+		std::vector< char > v1(5, 'c');
+		v1.assign(3, 'd');
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		print_content(v1);
+		std::cout << "v1[3] = " << v1[3] << std::endl;
+		// answer: no!
+		// If there is enough capacity, do not destroy and reallocate.
+		// Question: Are destructors called ?
+		std::cout << std::endl;
+	}
+	{
+		// To answer the last question, we create a 2D vector and check wheter
+		// the components of the main vector are destroyed.
+		std::cout << "std::vector< std::vector<char> > v1(4, std::vector<char>(5, '*'))\n";
+		std::vector< std::vector<char> > v1(4, std::vector<char>(5, '*'));
+		print_content(v1[0]);
+		v1.assign(3, std::vector<char>(5, 43));
+		print_content(v1[2]);
+		std::cout << std::endl;
+		// print_content(v1[3]); // weird output
+		// Answer: elements are destroyed.
+	}
+	{
+		// test whether a new storage is systematically allocated
+		std::cout << "Assign member function [ft]\n";
+		ft::vector< char > v1(5, 'c');
+		v1.assign(3, 'd');
+		std::cout << "v1.size() = " << v1.size() << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		print_content(v1);
+		std::cout << "v1[3] = " << v1[3] << std::endl;
+		// answer: no!
+		// If there is enough capacity, do not destroy and reallocate.
+		// Question: Are destructors called ?
+		std::cout << std::endl;
+	}
+	{
+		// To answer the last question, we create a 2D vector and check wheter
+		// the components of the main vector are destroyed.
+		std::cout << "std::vector< std::vector<char> > v1(4, std::vector<char>(5, '*'))\n";
+		ft::vector< ft::vector<char> > v1(4, ft::vector<char>(5, '*'));
+		print_content(v1[0]);
+		v1.assign(3, ft::vector<char>(5, 43));
+		print_content(v1[2]);
+		// print_content(v1[3]); // we ird output
+		// Answer: elements are destroyed.
+	}
+}
+
+void	test_assign_iterator( void )
+{
+	
+}
+
 void	test_constructors( void )
 {
 	constructor_default();
@@ -396,4 +482,7 @@ void	test_constructors( void )
 	constructor_count_value();
 	constructor_iterator();
 	constructor_copy();
+	test_assignment_operator();
+	test_assign_count_value();
+	test_assign_iterator();
 }
