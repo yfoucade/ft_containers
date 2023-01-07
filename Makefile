@@ -39,6 +39,7 @@ clean:
 
 fclean: clean
 	${RM} ${NAME}
+	${RM} ${VECTOR}
 
 re: fclean all
 
