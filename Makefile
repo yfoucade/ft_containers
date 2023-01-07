@@ -14,6 +14,11 @@ TEST_VECTOR = tests/test_vector
 TESTS_VECTOR_OBJ = \
 	tests/test_vector.o \
 	tests/vector_constructor.o \
+	tests/vector_access.o \
+	tests/vector_iterators.o \
+	tests/utils.o \
+	tests/vector_capacity.o \
+	tests/vector_modifiers.o \
 
 .PHONY = all clean fclean re
 
