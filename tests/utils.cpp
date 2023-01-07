@@ -1,22 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_vector.cpp                                    :+:      :+:    :+:   */
+/*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/26 13:58:39 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/08 00:26:31 by yfoucade         ###   ########.fr       */
+/*   Created: 2023/01/07 22:45:27 by yfoucade          #+#    #+#             */
+/*   Updated: 2023/01/07 22:45:37 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "tests.hpp"
 
-int main(void){
-	// test_constructors();
-	// test_access();
-	// test_iterators();
-	// test_capacity();
-	test_modifiers();
+ft::vector< int > range_vector(int min, int max)
+{
+	ft::vector< int > res;
+	while (min < max)
+		res.push_back(min++);
+	return res;
 }
