@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 13:15:17 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 17:06:46 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class vector{
 		T* _tab;
 		T* allocate_capacity(std::size_t target);
 		std::size_t get_alloc_size( std::size_t capacity );
+		void	destroy_tab_elements( void );
 
 	public:
 		typedef T value_type;
@@ -180,45 +181,31 @@ vector<T, Allocator>::~vector( void )
 {
 	if (!_tab)
 		return;
-	size_type i = _size;
-	iterator it = begin();
-	while (i)
-	{
-		--i;
-		(it++)->~T();
-	}
-	// Have a function that computes the number of elements to deallocate,
-	// or save it in a data member.m	
-	_allocator.deallocate(reinterpret_cast<typename Allocator::pointer>(_tab), get_alloc_size(_capacity));
+	destroy_tab_elements();
+	_allocator.deallocate(
+		reinterpret_cast<typename Allocator::pointer>(_tab),
+		get_alloc_size(_capacity));
 }
 
 template< typename T, typename Allocator >
 void vector<T, Allocator>::assign( size_type count, const T& value )
 {
-	if (_capacity < count)
-	{
-		this->~vector();
-		_capacity = count;
-		_tab = _allocator.allocate(_capacity);
-	}
+	destroy_tab_elements();
 	_size = count;
-	for (int i = 0; i < count; ++i)
-		_tab[i] = T(value);
+	reserve(_size);
+	for (size_type i = 0; i < count; ++i)
+		_tab[i] = value;
 }
 
 template< typename T, typename Allocator >
 template< class InputIt >
 void vector<T, Allocator>::assign( InputIt first, InputIt last )
 {
-	if (_capacity < last - first)
-	{
-		this->~vector();
-		_capacity = last - first;
-		_tab = _allocator.allocate(_capacity);
-	}
+	destroy_tab_elements();
 	_size = last - first;
-	for (InputIt tmp = first; tmp < last; ++tmp)
-		_tab[tmp - first] = T(*tmp);
+	reserve(_size);
+	for (InputIt tmp = first; tmp != last; ++tmp)
+		_tab[tmp - first] = *tmp;
 }
 
 template< typename T, typename Allocator >
@@ -549,6 +536,20 @@ std::size_t vector<T, Allocator>::get_alloc_size( std::size_t capacity )
 	if (n_elem * sizeof(typename Allocator::value_type) < required_size)
 		++n_elem;
 	return n_elem;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::destroy_tab_elements( void )
+{
+	iterator	first = begin();
+	iterator	last = end();
+
+	for ( ; first != last; ++first )
+		first->~T();
+	std::memset(
+		reinterpret_cast<void*>(_tab),
+		0,
+		get_alloc_size(_capacity) * sizeof(typename Allocator::value_type));
 }
 
 } // namespace ft
