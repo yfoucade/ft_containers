@@ -12,8 +12,8 @@ OBJ = ${SRC:.cpp=.o}
 
 TEST_VECTOR = tests/test_vector
 TESTS_VECTOR_OBJ = \
-	test_vector.o \
-	vector_constructor.o \
+	tests/test_vector.o \
+	tests/vector_constructor.o \
 
 .PHONY = all clean fclean re
 
@@ -23,7 +23,7 @@ ${NAME}: ${OBJ}
 	${CXX} ${CXXFLAGS} -o ${NAME} ${OBJ}
 
 %.o: %.cpp
-	${CXX} ${CXXFLAGS} -I. -c -o $@ $<
+	${CXX} ${CXXFLAGS} ${MMD} -I. -c -o $@ $<
 
 clean:
 	${RM} ${OBJ}
@@ -35,7 +35,7 @@ fclean: clean
 
 re: fclean all
 
-tests/test_vector: ${addprefix tests/, ${TESTS_VECTOR_OBJ}}
+tests/test_vector: ${TESTS_VECTOR_OBJ}
 	${CXX} ${CXXFLAGS} -I. -o $@ ${TESTS_VECTOR_OBJ}
 
--include ${SRC:.cpp=.d}
+-include ${SRC:.cpp=.d} ${TESTS_VECTOR_OBJ:.o=.d}
