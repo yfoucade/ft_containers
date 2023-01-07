@@ -6,19 +6,21 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 17:59:35 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/08 00:11:34 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <limits>
+#include <memory>
+#include <cstdio>
+#include <cstring>
+#include <string>
 #include "iterator.hpp"
 #include "enable_if.hpp"
 #include "is_integral.hpp"
 #include "lexicographical_compare.hpp"
-#include <limits>
-#include <memory>
-#include <cstring>
 
 namespace ft{
 
@@ -30,8 +32,9 @@ class vector{
 		std::size_t _capacity;
 		T* _tab;
 		T* allocate_capacity(std::size_t target);
-		std::size_t get_alloc_size( std::size_t capacity );
+		std::size_t get_alloc_size( std::size_t capacity ) const;
 		void	destroy_tab_elements( void );
+		std::string	out_of_range_string( std::size_t pos ) const;
 
 	public:
 		typedef T value_type;
@@ -219,16 +222,16 @@ template< typename T, typename Allocator >
 typename vector<T, Allocator>::reference vector<T, Allocator>::at( size_type pos )
 {
 	if (!(pos < size()))
-		throw (std::out_of_range());
-	return _tab + pos;
+		throw (std::out_of_range(out_of_range_string(pos)));
+	return *(_tab + pos);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reference vector<T, Allocator>::at( size_type pos ) const
 {
 	if (!(pos < size()))
-		throw (std::out_of_range());
-	return _tab + pos;
+		throw (std::out_of_range(out_of_range_string(pos)));
+	return *(_tab + pos);
 }
 
 template< typename T, typename Allocator >
@@ -239,29 +242,29 @@ typename vector<T, Allocator>::reference vector<T, Allocator>::operator[]( size_
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reference vector<T, Allocator>::operator[]( size_type pos ) const
 {
-	return _tab + pos;
+	return *(_tab + pos);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator >::reference vector<T, Allocator>::front( void )
 {
-	return _tab;
+	return *(_tab);
 }
 template< typename T, typename Allocator >
 typename vector<T, Allocator >::const_reference vector<T, Allocator>::front( void ) const
 {
-	return _tab;
+	return *(_tab);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::reference vector<T, Allocator>::back()
 {
-	return _tab + _size - 1;
+	return *(_tab + _size - 1);
 }
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reference vector<T, Allocator>::back() const
 {
-	return _tab + _size - 1;
+	return *(_tab + _size - 1);
 }
 
 template< typename T, typename Allocator >
@@ -306,25 +309,25 @@ typename vector<T, Allocator>::const_iterator vector<T, Allocator>::end( void ) 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::reverse_iterator vector<T, Allocator>::rbegin( void )
 {
-	return _tab + _size;
+	return ft::reverse_iterator<iterator>(_tab + _size);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reverse_iterator vector<T, Allocator>::rbegin( void ) const
 {
-	return _tab + _size;
+	return ft::reverse_iterator<iterator>(_tab + _size);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::reverse_iterator vector<T, Allocator>::rend( void )
 {
-	return _tab;
+	return ft::reverse_iterator<iterator>(_tab);
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::const_reverse_iterator vector<T, Allocator>::rend( void ) const
 {
-	return _tab;
+	return ft::reverse_iterator<iterator>(_tab);
 }
 
 template< typename T, typename Allocator >
@@ -371,7 +374,7 @@ typename vector<T, Allocator>::size_type vector<T, Allocator>::capacity() const
 template< typename T, typename Allocator >
 void vector<T, Allocator>::clear()
 {
-	for (int i = 0; i < _size; ++i)
+	for (size_type i = 0; i < _size; ++i)
 		_tab[i].~T();
 	_size = 0;
 }
@@ -505,6 +508,23 @@ void vector<T, Allocator>::swap( vector& other )
 	other._tab = tmp_tab;
 }
 
+template< typename T, typename Allocator >
+std::string vector<T, Allocator>::out_of_range_string( size_type pos ) const
+{
+	char	buffer[100];
+	int		ret;
+
+	ret = sprintf(
+		buffer,
+		"vector: out of range exception. pos (which is %lu) >= this->size() (which is %lu)",
+		pos,
+		size()
+	);
+	if (ret < 0)
+		return std::string("Out of range exception");
+	return buffer;
+}
+
 } // namespace ft
 
 // private member functions
@@ -529,7 +549,7 @@ T* vector<T, Allocator>::allocate_capacity( std::size_t target_capacity )
 }
 
 template< typename T, typename Allocator >
-std::size_t vector<T, Allocator>::get_alloc_size( std::size_t capacity )
+std::size_t vector<T, Allocator>::get_alloc_size( std::size_t capacity ) const
 {
 	size_type required_size = capacity * sizeof(T);
 	size_type n_elem = required_size / sizeof(typename Allocator::value_type);
