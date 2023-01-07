@@ -1,3 +1,4 @@
 *.o
+*.d
 containers
 test_vector
