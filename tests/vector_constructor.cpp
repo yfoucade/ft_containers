@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:20:17 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/07 17:21:01 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/07 17:43:32 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -467,12 +467,28 @@ void	test_assign_count_value( void )
 		print_content(v1[2]);
 		// print_content(v1[3]); // we ird output
 		// Answer: elements are destroyed.
+		std::cout << std::endl;
 	}
 }
 
 void	test_assign_iterator( void )
 {
-	
+	{
+		std::cout << "Assign(first, last) [std]\n";
+		int	tab_int[5] = {1, 2, 3, 4, 5};
+		std::cout << "std::vector< int > v1()\n";
+		std::vector< int > v1;
+		v1.assign(tab_int, tab_int + 4);
+		print_content(v1);
+	}
+	{
+		std::cout << "Assign(first, last) [ft]\n";
+		int	tab_int[5] = {1, 2, 3, 4, 5};
+		std::cout << "std::vector< int > v1()\n";
+		ft::vector< int > v1;
+		v1.assign(tab_int, tab_int + 4);
+		print_content(v1);
+	}
 }
 
 void	test_constructors( void )
