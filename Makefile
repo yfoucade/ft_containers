@@ -10,7 +10,8 @@ SRC = main.cpp
 
 OBJ = ${SRC:.cpp=.o}
 
-TESTS_VECTOR = \
+TEST_VECTOR = tests/test_vector
+TESTS_VECTOR_OBJ = \
 	test_vector.o \
 	vector_constructor.o \
 
@@ -22,20 +23,19 @@ ${NAME}: ${OBJ}
 	${CXX} ${CXXFLAGS} -o ${NAME} ${OBJ}
 
 %.o: %.cpp
-	${CXX} ${CXXFLAGS} -I. -c $<
+	${CXX} ${CXXFLAGS} -I. -c -o $@ $<
 
 clean:
 	${RM} ${OBJ}
 	${RM} ${SRC:.cpp=.d}
-	${RM} tests/test_vector.o
+	${RM} ${TESTS_VECTOR_OBJ}
 
 fclean: clean
 	${RM} ${NAME}
 
 re: fclean all
 
-#relinks
-test_vector: ${addprefix tests/, ${TESTS_VECTOR}}
-	${CXX} ${CXXFLAGS} -I. -o tests/$@ ${TESTS_VECTOR}
+tests/test_vector: ${addprefix tests/, ${TESTS_VECTOR_OBJ}}
+	${CXX} ${CXXFLAGS} -I. -o $@ ${TESTS_VECTOR_OBJ}
 
 -include ${SRC:.cpp=.d}
