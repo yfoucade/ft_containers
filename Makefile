@@ -1,4 +1,5 @@
 NAME = containers
+VECTOR = tests/test_vector
 
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
@@ -33,6 +34,7 @@ ${NAME}: ${OBJ}
 clean:
 	${RM} ${OBJ}
 	${RM} ${SRC:.cpp=.d}
+	${RM} ${TESTS_VECTOR_OBJ:.o=.d}
 	${RM} ${TESTS_VECTOR_OBJ}
 
 fclean: clean
@@ -40,7 +42,7 @@ fclean: clean
 
 re: fclean all
 
-tests/test_vector: ${TESTS_VECTOR_OBJ}
+${VECTOR}: ${TESTS_VECTOR_OBJ}
 	${CXX} ${CXXFLAGS} -I. -o $@ ${TESTS_VECTOR_OBJ}
 
 -include ${SRC:.cpp=.d} ${TESTS_VECTOR_OBJ:.o=.d}
