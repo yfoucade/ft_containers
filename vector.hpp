@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/08 00:11:34 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/08 01:55:02 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,10 +120,7 @@ vector<T, Allocator>::vector( const Allocator& alloc ):
 			_size(0),
 			_capacity(0),
 			_tab(NULL)
-{
-	std::cout << "Alloc constructor called with type of size: ";
-	std::cout << sizeof(typename Allocator::value_type) << std::endl;
-}
+{}
 
 template < typename T, typename Allocator >
 vector<T, Allocator>::vector(
@@ -374,8 +371,7 @@ typename vector<T, Allocator>::size_type vector<T, Allocator>::capacity() const
 template< typename T, typename Allocator >
 void vector<T, Allocator>::clear()
 {
-	for (size_type i = 0; i < _size; ++i)
-		_tab[i].~T();
+	destroy_tab_elements();
 	_size = 0;
 }
 
