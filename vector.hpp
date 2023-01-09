@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/08 01:55:02 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/09 17:29:30 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class vector{
 		std::size_t get_alloc_size( std::size_t capacity ) const;
 		void	destroy_tab_elements( void );
 		std::string	out_of_range_string( std::size_t pos ) const;
+		void	shift( std::size_t idx, std::size_t count );
 
 	public:
 		typedef T value_type;
@@ -102,7 +103,10 @@ class vector{
 		iterator insert( const_iterator pos, const T& value );
 		iterator insert( const_iterator pos, size_type count, const T& value );
 		template< class InputIt >
-		iterator insert( const_iterator pos, InputIt first, InputIt last );
+		iterator insert(
+			const_iterator pos,
+			typename ft::enable_if< !ft::is_integral<InputIt>::value, InputIt >::type first,
+			InputIt last );
 		iterator erase( iterator pos );
 		iterator erase( iterator first, iterator last );
 		void push_back( const T& value );
@@ -384,46 +388,43 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iter
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, size_type count, const T& value )
 {
-	if (!count)
-		return pos;
-	reserve(_size + count);
-	T* start = _tab[_size - 1];
-	T* it = start;
-	T* end = _tab[pos - 1];
-	for (; it != end; --it)
-		it[count] = *it;
-	for (int i = 0; i < count; ++i)
-		_tab[i + pos] = T(value);
-	return _tab + pos;
+	if ( ( _tab && !pos ) || ( !_tab && pos ) || !count)
+		return const_cast<iterator>(pos);
+	size_type idx = !pos ? 0 : static_cast< size_type >( pos - begin() );
+	shift(idx, count);
+	for (size_type i = 0; i < count; ++i)
+		_tab[idx + i] = value;
+	_size += count;
+	return _tab + idx;
 }
 
 template< typename T, typename Allocator >
 template< class InputIt >
-typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iterator pos, InputIt first, InputIt last )
+typename vector<T, Allocator>::iterator vector<T, Allocator>::insert(
+	const_iterator pos,
+	typename ft::enable_if< !ft::is_integral<InputIt>::value, InputIt >::type first,
+	InputIt last )
 {
-	if (last == first)
-		return pos;
+	if ( ( _tab && !pos ) || ( !_tab && pos ) || last == first)
+		return const_cast<iterator>(pos);
 	size_type count = static_cast<size_type>(last - first);
-	reserve(_size + count);
-	T* start = _tab[_size - 1];
-	T* it = start;
-	T* end = _tab[pos - 1];
-	for (; it != end; --it)
-		it[count] = *it;
-	for (InputIt it = start; it != end; ++it)
-		_tab[pos + (it - start)] = T(*it);
-	return _tab + pos;
+	size_type idx = !pos ? 0 : static_cast< size_type >( pos - begin() );
+	shift(idx, count);
+	for (InputIt it = first; it != last; ++it)
+		_tab[idx + (it - first)] = *it;
+	_size += count;
+	return _tab + idx;
 }
 
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
 {
-	_tab[pos].~T();
-	--_size;
+	pos->~T();
 	iterator it = pos;
 	iterator ret = it;
-	iterator end = end();
-	while (++it != end)
+	iterator last = end();
+	--_size;
+	while (++it != last)
 		*pos++ = *it;
 	return ret;
 }
@@ -435,14 +436,14 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 		return last;
 	iterator it = first;
 	iterator ret = it;
-	iterator end = end();
+	iterator finish = end();
 	while (it != last)
 	{
 		it++->~T();
 		--_size;
 	}
 	it = first;
-	while (last != end)
+	while (last != finish)
 		*it++ = *last++;
 	return ret;
 }
@@ -450,15 +451,16 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 template< typename T, typename Allocator >
 void vector<T, Allocator>::push_back( const T& value )
 {
-	if (_size == _capacity)
-	{
-		if (_capacity == max_size())
-			throw (std::length_error("Cannot allocate more than max_size()"));
-		if (!_capacity)
-			reserve(1);
-		else
-			reserve(_capacity > (max_size() >> 1) ? max_size() : 2 * _capacity);
-	}
+	// if (_size == _capacity)
+	// {
+	// 	if (_capacity == max_size())
+	// 		throw (std::length_error("Cannot allocate more than max_size()"));
+	// 	if (!_capacity)
+	// 		reserve(1);
+	// 	else
+	// 		reserve(_capacity > (max_size() >> 1) ? max_size() : 2 * _capacity);
+	// }
+	reserve(_size + 1);
 	_tab[_size++] = value;
 }
 
@@ -566,6 +568,15 @@ void vector<T, Allocator>::destroy_tab_elements( void )
 		reinterpret_cast<void*>(_tab),
 		0,
 		get_alloc_size(_capacity) * sizeof(typename Allocator::value_type));
+}
+
+template< typename T, typename Allocator >
+void	vector< T, Allocator >::shift(size_type idx, size_type count)
+{
+	reserve(_size + count);
+	size_type i = end() - begin();
+	for ( ; i > idx; --i )
+		_tab[i + count - 1] = _tab[i - 1];
 }
 
 } // namespace ft
