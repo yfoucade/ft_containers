@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:01:21 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/08 00:43:26 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/10 13:20:03 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	test_iterators( void );
 ft::vector< int > range_vector(int min, int max);
 void	test_capacity( void );
 void	test_modifiers( void );
+void	test_non_member( void );
 
 template< typename Container >
 void print_content( Container c, char sep )

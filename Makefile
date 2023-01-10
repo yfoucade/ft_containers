@@ -20,6 +20,7 @@ TESTS_VECTOR_OBJ = \
 	tests/utils.o \
 	tests/vector_capacity.o \
 	tests/vector_modifiers.o \
+	tests/vector_non_member.o \
 
 .PHONY = all clean fclean re
 
