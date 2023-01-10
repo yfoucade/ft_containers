@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/10 12:14:28 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/10 12:27:08 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,6 +354,7 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 		throw (std::length_error("Cannot allocate more than max_size()"));
 	if (new_cap <= _capacity)
 		return;
+	new_cap = (new_cap > (max_size() >> 1) ? max_size() : 2 * new_cap);
 	T* tmp = (allocate_capacity(new_cap));
 	iterator first = begin();
 	iterator last = end();
@@ -449,15 +450,6 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 template< typename T, typename Allocator >
 void vector<T, Allocator>::push_back( const T& value )
 {
-	// if (_size == _capacity)
-	// {
-	// 	if (_capacity == max_size())
-	// 		throw (std::length_error("Cannot allocate more than max_size()"));
-	// 	if (!_capacity)
-	// 		reserve(1);
-	// 	else
-	// 		reserve(_capacity > (max_size() >> 1) ? max_size() : 2 * _capacity);
-	// }
 	reserve(_size + 1);
 	_tab[_size++] = value;
 }

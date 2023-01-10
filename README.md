@@ -1,2 +1,2 @@
 todo:  
-- [ ] refactor vector::reserve() to try to double capacity.
+- [x] refactor vector::reserve() to try to double capacity.
