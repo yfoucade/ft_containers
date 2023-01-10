@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/10 12:27:08 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/10 13:24:37 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -580,15 +580,15 @@ template< class T, class Alloc >
 bool operator==(	const ft::vector<T,Alloc>& lhs,
 					const ft::vector<T,Alloc>& rhs )
 {
-	typename vector<T, Alloc>::iterator first1 = lhs.begin(), last1 = lhs.end();
-	typename vector<T, Alloc>::iterator first2 = rhs.begin(), last2 = rhs.end();
+	typename vector<T, Alloc>::const_iterator first1 = lhs.begin(), last1 = lhs.end();
+	typename vector<T, Alloc>::const_iterator first2 = rhs.begin();
 
 	if (lhs.size() != rhs.size())
 		return false;
-	while ((first1 != last1) && (first2 != last2))
+	while (first1 != last1)
 		if (*first1++ != *first2++)
 			return false;
-	return (first1 == last1) && (first2 == last2);
+	return true;
 }
 
 template< class T, class Alloc >
