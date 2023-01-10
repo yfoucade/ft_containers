@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/08 00:29:30 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/09 17:27:43 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/10 12:16:07 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,6 +269,33 @@ void	test_erase( void )
 			std::cout << "Success\n";
 		std::cout << std::endl;
 	}
+
+	{
+		std::cout << "does erase() call the destructors of the deleted elements? [std]\n";
+		std::vector< std::vector< int > > v1;
+		v1.push_back( std::vector< int >(2, 42) );
+		typename std::vector< std::vector< int > >::iterator it = v1.begin();
+		std::cout << "v1.data() = " << v1.data() << std::endl;
+		std::cout << "(*it)[0] = " << (*it)[0] << std::endl;
+		v1.erase(it);
+		std::cout << "v1.data() = " << v1.data() << std::endl;
+		// std::cout << "(*it)[0] = " << (*it)[0] << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "does erase() call the destructors of the deleted elements? [ft]\n";
+		ft::vector< ft::vector< int > > v1;
+		v1.push_back( ft::vector< int >(2, 42) );
+		typename ft::vector< ft::vector< int > >::iterator it = v1.begin();
+		std::cout << "v1.data() = " << v1.data() << std::endl;
+		std::cout << "(*it)[0] = " << (*it)[0] << std::endl;
+		v1.erase(it);
+		std::cout << "v1.data() = " << v1.data() << std::endl;
+		// std::cout << "(*it)[0] = " << (*it)[0] << std::endl;
+		std::cout << "v1.capacity() = " << v1.capacity() << std::endl;
+		std::cout << std::endl;
+	}
 }
 
 void	test_erase_2( void )
@@ -343,19 +370,81 @@ void	test_push_back( void )
 
 void	test_pop_back( void )
 {
-	
+	{
+		std::cout << "test pop_back() [std]\n";
+		std::vector< int > v1(3, 42);
+		v1.pop_back();
+		print_content(v1);
+		v1.pop_back();
+		print_content(v1);
+		v1.pop_back();
+		print_content(v1);
+		// v1.pop_back();
+		// print_content(v1);
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "test pop_back() [ft]\n";
+		ft::vector< int > v1(3, 42);
+		v1.pop_back();
+		print_content(v1);
+		v1.pop_back();
+		print_content(v1);
+		v1.pop_back();
+		print_content(v1);
+		v1.pop_back();
+		print_content(v1);
+		std::cout << std::endl;
+	}
 }
 
 void	test_resize( void )
 {
-	
+	{
+		std::cout << "test resize(count, value) [std]\n";
+		std::vector< int > v1(5, 42);
+		v1.resize(7, 21);
+		print_content(v1);
+		v1.resize(2, 0);
+		print_content(v1);
+		v1.resize(0, 0);
+		print_content(v1);
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "test resize(count, value) [ft]\n";
+		ft::vector< int > v1(5, 42);
+		v1.resize(7, 21);
+		print_content(v1);
+		v1.resize(2, 0);
+		print_content(v1);
+		v1.resize(0, 0);
+		print_content(v1);
+		std::cout << std::endl;
+	}
 }
 
 void	test_swap( void )
 {
-	
+	{
+		std::cout << "test swap(other) [std]\n";
+		std::vector< int > v1(5, 42);
+		std::vector< int > v2(2, 21);
+		v1.swap(v2);
+		print_content(v1);
+		print_content(v2);
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "test swap(other) [ft]\n";
+		ft::vector< int > v1(5, 42);
+		ft::vector< int > v2(2, 21);
+		v1.swap(v2);
+		print_content(v1);
+		print_content(v2);
+		std::cout << std::endl;
+	}
 }
-
 
 void	test_modifiers( void )
 {
