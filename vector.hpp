@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/09 17:29:30 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/10 12:14:28 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ class vector{
 		iterator erase( iterator first, iterator last );
 		void push_back( const T& value );
 		void pop_back();
-		void resize( size_type count );
+		void resize( size_type count, T value = T() );
 		void swap( vector& other );
 };
 
@@ -271,8 +271,6 @@ typename vector<T, Allocator>::const_reference vector<T, Allocator>::back() cons
 template< typename T, typename Allocator >
 T* vector<T, Allocator>::data()
 {
-	if (!_size)
-		return NULL;
 	return _tab;
 }
 template< typename T, typename Allocator >
@@ -467,18 +465,20 @@ void vector<T, Allocator>::push_back( const T& value )
 template< typename T, typename Allocator >
 void vector<T, Allocator>::pop_back()
 {
+	if (!_size)
+		return ;
 	_tab[_size - 1].~T();
 	--_size;
 }
 
 template< typename T, typename Allocator >
-void vector<T, Allocator>::resize( size_type count )
+void vector<T, Allocator>::resize( size_type count, T value )
 {
 	reserve(count);
 	if (_size < count)
 	{
 		for (size_type i = _size; i < count; ++i)
-			_tab[i] = T();
+			_tab[i] = value;
 	}
 	else
 	{
@@ -504,23 +504,6 @@ void vector<T, Allocator>::swap( vector& other )
 	other._size = tmp_size;
 	other._capacity = tmp_capacity;
 	other._tab = tmp_tab;
-}
-
-template< typename T, typename Allocator >
-std::string vector<T, Allocator>::out_of_range_string( size_type pos ) const
-{
-	char	buffer[100];
-	int		ret;
-
-	ret = sprintf(
-		buffer,
-		"vector: out of range exception. pos (which is %lu) >= this->size() (which is %lu)",
-		pos,
-		size()
-	);
-	if (ret < 0)
-		return std::string("Out of range exception");
-	return buffer;
 }
 
 } // namespace ft
@@ -577,6 +560,23 @@ void	vector< T, Allocator >::shift(size_type idx, size_type count)
 	size_type i = end() - begin();
 	for ( ; i > idx; --i )
 		_tab[i + count - 1] = _tab[i - 1];
+}
+
+template< typename T, typename Allocator >
+std::string vector<T, Allocator>::out_of_range_string( size_type pos ) const
+{
+	char	buffer[100];
+	int		ret;
+
+	ret = sprintf(
+		buffer,
+		"vector: out of range exception. pos (which is %lu) >= this->size() (which is %lu)",
+		pos,
+		size()
+	);
+	if (ret < 0)
+		return std::string("Out of range exception");
+	return buffer;
 }
 
 } // namespace ft
