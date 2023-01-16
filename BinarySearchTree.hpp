@@ -6,18 +6,21 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/13 14:01:28 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/15 22:01:27 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#pragma once
 
 #include <functional>
 
 namespace ft
 {
 
+// implement a member function get_root() that returns a reference to the root.
 template<
 	typename Key,
-	typename T = int,
+	typename T = void,
 	typename Compare = std::less<Key>
 > class BinarySearchTree
 {
@@ -31,23 +34,32 @@ template<
 		BinarySearchTree( void );
 
 	public:
-		BinarySearchTree( Key key );
-		BinarySearchTree( Key key, T *value );
+		BinarySearchTree( const Key& key );
+		BinarySearchTree( const Key& key, T* value );
 		BinarySearchTree( const BinarySearchTree& other );
 		BinarySearchTree& operator=( const BinarySearchTree& other );
 		~BinarySearchTree( void );
+		BinarySearchTree* search( const Key& _key );
 		BinarySearchTree* search( const Key& _key ) const;
+		BinarySearchTree* minimum( void );
 		BinarySearchTree* minimum( void ) const;
+		BinarySearchTree* maximum( void );
 		BinarySearchTree* maximum( void ) const;
+		BinarySearchTree* successor( void );
 		BinarySearchTree* successor( void ) const;
+		BinarySearchTree* predecessor( void );
 		BinarySearchTree* predecessor( void ) const;
-		void insert( BinarySearchTree *other );
-		BinarySearchTree* transplant( BinarySearchTree *other );
+		void insert( BinarySearchTree& other );
+		// void insert( const Key& key );
+		// void insert( const Key& key, T* value );
+		BinarySearchTree* transplant( BinarySearchTree* other );
 		BinarySearchTree* remove( void );
+		Key get_key( void ) const;
+		T *get_value( void ) const;
 };
 
 template< typename Key, typename T, typename Compare >
-BinarySearchTree< Key, T, Compare >::BinarySearchTree( Key key ):
+BinarySearchTree< Key, T, Compare >::BinarySearchTree( const Key& key ):
 _key(key),
 _value(NULL),
 _parent(NULL),
@@ -55,7 +67,7 @@ _left(NULL),
 _right(NULL){}
 
 template< typename Key, typename T, typename Compare >
-BinarySearchTree< Key, T, Compare >::BinarySearchTree( Key key, T *value ):
+BinarySearchTree< Key, T, Compare >::BinarySearchTree( const Key& key, T *value ):
 _key(key),
 _value(value),
 _parent(NULL),
@@ -86,9 +98,28 @@ BinarySearchTree< Key, T, Compare >& BinarySearchTree< Key, T, Compare >::operat
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >::~BinarySearchTree( void )
 {
-	_left->~BinarySearchTree();
-	_right->~BinarySearchTree();
+	if (_left)
+		_left->~BinarySearchTree();
+	if (_right)
+		_right->~BinarySearchTree();
 	remove();
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::search( const Key& key )
+{
+	BinarySearchTree *res = this;
+	while ( res )
+	{
+		if ( key_compare(res->_key, key) )
+			res = res->_right;
+		else if ( key_compare(key, res->_key) )
+			res = res->_left;
+		else
+			break;
+	}
+	return res;
 }
 
 template< typename Key, typename T, typename Compare >
@@ -98,13 +129,23 @@ BinarySearchTree< Key, T, Compare >::search( const Key& key ) const
 	BinarySearchTree *res = this;
 	while ( res )
 	{
-		if ( comp(res->_key, key) )
+		if ( key_compare(res->_key, key) )
 			res = res->_right;
-		else if ( comp(key, res->_key) )
+		else if ( key_compare(key, res->_key) )
 			res = res->_left;
 		else
 			break;
 	}
+	return res;
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::minimum( void )
+{
+	BinarySearchTree *res = this;
+	while (res->_left)
+		res = res->_left;
 	return res;
 }
 
@@ -120,11 +161,38 @@ BinarySearchTree< Key, T, Compare >::minimum( void ) const
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::maximum( void )
+{
+	BinarySearchTree *res = this;
+	while (res->_right)
+		res = res->_right;
+	return res;
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
 BinarySearchTree< Key, T, Compare >::maximum( void ) const
 {
 	BinarySearchTree *res = this;
 	while (res->_right)
 		res = res->_right;
+	return res;
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::successor( void )
+{
+	BinarySearchTree *curr = this;
+	BinarySearchTree *res = this->_parent;
+
+	if ( _right )
+		return (_right->minimum());
+	while ( res && (curr == res->_right) )
+	{
+		curr = res;
+		res = res->_parent;
+	}
 	return res;
 }
 
@@ -147,13 +215,30 @@ BinarySearchTree< Key, T, Compare >::successor( void ) const
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::predecessor( void )
+{
+	BinarySearchTree *curr = this;
+	BinarySearchTree *res = this->_parent;
+
+	if ( _left )
+		return (_left->maximum());
+	while ( res && (curr == res->_left) )
+	{
+		curr = res;
+		res = res->_parent;
+	}
+	return res;
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
 BinarySearchTree< Key, T, Compare >::predecessor( void ) const
 {
 	BinarySearchTree *curr = this;
 	BinarySearchTree *res = this->_parent;
 
-	if ( _right )
-		return (_right->maximum());
+	if ( _left )
+		return (_left->maximum());
 	while ( res && (curr == res->_left) )
 	{
 		curr = res;
@@ -164,7 +249,7 @@ BinarySearchTree< Key, T, Compare >::predecessor( void ) const
 
 template< typename Key, typename T, typename Compare >
 void
-BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree *other )
+BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree& other )
 {
 	BinarySearchTree *leading = this;
 	BinarySearchTree *trailing = NULL;
@@ -172,27 +257,69 @@ BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree *other )
 	while (leading)
 	{
 		trailing = leading;
-		leading = key_compare(leading->_key, other->_key) ? leading->_right : leading->_left;
+		leading = key_compare(leading->_key, other._key) ? leading->_right : leading->_left;
 	}
-	other->_parent = trailing;
-	if ( key_compare(trailing->_key, other->_key) )
-		trailing->_right = other;
+	other._parent = trailing;
+	if ( key_compare(trailing->_key, other._key) )
+		trailing->_right = &other;
 	else
-		trailing->_left = other;
+		trailing->_left = &other;
 }
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >*
-BinarySearchTree< Key, T, Compare >::transplant( BinarySearchTree *other )
+BinarySearchTree< Key, T, Compare >::transplant( BinarySearchTree* other )
 {
-	return NULL;
+	if (!_parent)
+		;
+	else if (this == _parent->_left)
+		_parent->_left = other;
+	else
+		_parent->_right = other;
+	if (other)
+		other->_parent = _parent;
+	_parent = NULL;
+	return this;
 }
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >*
 BinarySearchTree< Key, T, Compare >::remove( void )
 {
-	return NULL;
+	BinarySearchTree* successor;
+
+	if (!_left)
+		transplant(_right);
+	else if (!_right)
+		transplant(_left);
+	else
+	{
+		successor = minimum();
+		if (successor->_parent != this)
+		{
+			successor->transplant(successor->_right);
+			successor->_right = _right;
+			successor->_right->_parent = successor;
+		}
+		transplant(successor);
+		successor->_left = _left;
+		successor->_left->_parent = successor;
+	}
+	return this;
+}
+
+template< typename Key, typename T, typename Compare >
+Key
+BinarySearchTree< Key, T, Compare >::get_key( void ) const
+{
+	return _key;
+}
+
+template< typename Key, typename T, typename Compare >
+T*
+BinarySearchTree< Key, T, Compare >::get_value( void ) const
+{
+	return _value;
 }
 
 } // namespace ft
