@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/11 17:35:39 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/14 15:23:33 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ int main( void )
 	n.insert(std::pair< char, int >('d', 4));
 	m.insert(std::pair< char, int >('d', 4));
 
-	for (auto i = m.begin(); i != m.end(); ++i)
+	std::map< char, int >::iterator j = ++m.begin();
+	std::map< char, int >::iterator i;
+	for (i = m.begin(); i != m.end(); ++i)
 	{
 		std::cout << (&*i) << ": " << i->first << ", " << (*i).second << std::endl;
 	}
