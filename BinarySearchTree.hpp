@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/15 22:01:27 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/16 16:55:18 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ template<
 		~BinarySearchTree( void );
 		BinarySearchTree* search( const Key& _key );
 		BinarySearchTree* search( const Key& _key ) const;
+		BinarySearchTree* get_root( void );
 		BinarySearchTree* minimum( void );
 		BinarySearchTree* minimum( void ) const;
 		BinarySearchTree* maximum( void );
@@ -137,6 +138,16 @@ BinarySearchTree< Key, T, Compare >::search( const Key& key ) const
 			break;
 	}
 	return res;
+}
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree< Key, T, Compare >*
+BinarySearchTree< Key, T, Compare >::get_root( void )
+{
+	BinarySearchTree *ret = this;
+	while ( ret->_parent )
+		ret = ret->_parent;
+	return ret;
 }
 
 template< typename Key, typename T, typename Compare >
