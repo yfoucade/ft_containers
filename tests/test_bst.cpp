@@ -6,13 +6,12 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 15:05:08 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/14 17:11:18 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/17 12:30:25 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include "BinarySearchTree.hpp"
-#include "BSTIterator.hpp"
 
 int	main( void )
 {
@@ -71,11 +70,18 @@ int	main( void )
 	}
 	std::cout << std::endl << std::endl;
 
-	ft::BSTIterator< char > it(&bst);
-	ft::BSTIterator< char > end;
+	ft::BinarySearchTree< char >::iterator it(&bst);
+	ft::BinarySearchTree< char >::iterator end;
 	while (it != end)
 	{
 		std::cout << (*it) << std::endl;
+		*it = '*';
 		++it;
+	}
+	ft::BinarySearchTree< char >::iterator it2(&bst);
+	while (it2 != end)
+	{
+		std::cout << (*it2) << std::endl;
+		++it2;
 	}
 }
