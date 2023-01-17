@@ -6,13 +6,14 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/17 11:45:08 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/17 12:48:27 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include <functional>
+#include "BSTIterator.hpp"
 
 namespace ft
 {
@@ -36,6 +37,7 @@ template<
 	public:
 		typedef T& indirection_type;
 		typedef T* member_of_pointer_type;
+		typedef BSTIterator< BinarySearchTree<Key, void, Compare> > iterator;
 		BinarySearchTree( const Key& key );
 		BinarySearchTree( const Key& key, T* value );
 		BinarySearchTree( const BinarySearchTree& other );
@@ -384,6 +386,7 @@ class BinarySearchTree<Key, void, Compare>
 	public:
 		typedef Key& indirection_type;
 		typedef Key* member_of_pointer_type;
+		typedef BSTIterator< BinarySearchTree<Key, void, Compare> > iterator;
 		BinarySearchTree( const Key& key );
 		BinarySearchTree( const BinarySearchTree& other );
 		BinarySearchTree& operator=( const BinarySearchTree& other );
@@ -669,7 +672,7 @@ template< typename Key, typename Compare >
 typename BinarySearchTree<Key, void, Compare>::indirection_type
 BinarySearchTree<Key, void, Compare>::indirection( void )
 {
-	return &_key;
+	return _key;
 }
 
 template< typename Key, typename Compare >
