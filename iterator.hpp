@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_iterator.hpp                                    :+:      :+:    :+:   */
+/*   iterator.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 11:45:10 by yfoucade          #+#    #+#             */
-/*   Updated: 2022/12/31 21:01:09 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/19 17:15:00 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,13 +115,15 @@ namespace ft
 	template< typename Iter >
 	typename reverse_iterator<Iter>::reference reverse_iterator<Iter>::operator*( void ) const
 	{
-		return *(current - 1);
+		iterator_type tmp = current;
+		return *(--tmp);
 	}
 
 	template< typename Iter >
 	typename reverse_iterator<Iter>::pointer reverse_iterator<Iter>::operator->( void ) const
 	{
-		return current - 1;
+		iterator_type tmp = current;
+		return --tmp;
 	}
 
 	template< typename Iter >
@@ -154,7 +156,7 @@ namespace ft
 	reverse_iterator<Iter> reverse_iterator<Iter>::operator--( int )
 	{
 		reverse_iterator<Iter> old(*this);
-		--current;
+		++current;
 		return old;
 	}
 	
