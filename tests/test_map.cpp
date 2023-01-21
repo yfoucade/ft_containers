@@ -6,13 +6,24 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/19 18:37:33 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/21 09:35:57 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <map>
 
+void test_insert( void )
+{
+	// map.insert() copies the values
+	std::map< char, int > m;
+	std::pair< const char, int > p('a', 1);
+	
+	m.insert(p);
+	p.second = 2;
+	std::cout << p.second << std::endl;
+	std::cout << (m['a']) << std::endl;
+}
 int main( void )
 {
 	std::map< char, int > m;
@@ -36,4 +47,5 @@ int main( void )
 		break;
 	}
 	// data is not contiguous in memory, it is not sorted in memory neither.
+	test_insert();
 }
