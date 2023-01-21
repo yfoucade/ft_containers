@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/17 12:48:49 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/19 19:21:28 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,33 @@ namespace ft
 // template parameter: class BinarySearchTree, then define member types in terms
 // of those of the parameter.
 template<
-	typename BST
+	typename BST,
+	typename T
 > class BSTIterator{
-	private:
-		BST* _node;
-
 	public:
 		typedef void difference_type;
-		typedef BST value_type;
-		typedef BST* pointer;
-		typedef BST& reference;
+		typedef T value_type;
+		typedef T* pointer;
+		typedef T& reference;
 		typedef std::bidirectional_iterator_tag iterator_category;
-		typedef typename BST::indirection_type indirection_type;
-		typedef typename BST::member_of_pointer_type member_of_pointer_type;
+		typedef T& indirection_type;
+		typedef T* member_of_pointer_type;
+
+	private:
+		BST* _root;
+		BST* _curr;
+		pointer _value;
+
+	public:
 		BSTIterator( void );
 		BSTIterator( BST* node );
 		BSTIterator( const BSTIterator& other );
 		BSTIterator& operator=( const BSTIterator& other );
 		~BSTIterator( void );
-		template< typename A >
-		friend bool operator==( const BSTIterator< A >&, const BSTIterator< A >& );
-		template< typename A >
-		friend bool operator!=( const BSTIterator< A >&, const BSTIterator< A >& );
+		template< typename A, typename B >
+		friend bool operator==( const BSTIterator< A, B >&, const BSTIterator< A, B >& );
+		template< typename A, typename B >
+		friend bool operator!=( const BSTIterator< A, B >&, const BSTIterator< A, B >& );
 		// reference operator*( void );
 		indirection_type operator*( void );
 		member_of_pointer_type operator->( void );
@@ -50,77 +55,94 @@ template<
 		BSTIterator operator--( int );
 };
 
-template< typename BST >
-BSTIterator< BST >::BSTIterator( void ):
-_node(NULL){}
+template< typename BST, typename T >
+BSTIterator< BST, T >::BSTIterator( void ):
+_root(NULL), _curr(NULL), _value(NULL){}
 
-template< typename BST >
-BSTIterator< BST >::BSTIterator( BST* node ):
-_node(node){}
+template< typename BST, typename T >
+BSTIterator< BST, T >::BSTIterator( BST* node ):
+_root(node->get_root()), _curr(node), _value(node->member_of_pointer()){}
 
-template< typename BST >
-BSTIterator< BST >::BSTIterator( const BSTIterator& other ):
-_node(other._node){}
+template< typename BST, typename T >
+BSTIterator< BST, T >::BSTIterator( const BSTIterator& other ):
+_root(other._root), _curr(other._curr), _value(other._value){}
 
-template< typename BST >
-BSTIterator< BST >&
-BSTIterator< BST >::operator=( const BSTIterator& other )
+template< typename BST, typename T >
+BSTIterator< BST, T >&
+BSTIterator< BST, T >::operator=( const BSTIterator& other )
 {
 	if ( this == &other )
 		return *this;
-	_node = other._node;
-}
-
-template< typename BST >
-BSTIterator< BST >::~BSTIterator( void )
-{}
-
-template< typename BST >
-// typename BSTIterator< BST >::reference
-typename BSTIterator< BST >::indirection_type
-BSTIterator< BST >::operator*( void )
-{
-	return _node->indirection();
-}
-
-template< typename BST >
-typename BSTIterator< BST >::member_of_pointer_type
-BSTIterator< BST >::operator->( void )
-{
-	return _node.member_of_pointer();
-}
-
-template< typename BST >
-BSTIterator< BST >&
-BSTIterator< BST >::operator++( void )
-{
-	_node = _node->successor();
+	_root = other._root;
+	_curr = other._curr;
+	_value = other._value;
 	return *this;
 }
 
-template< typename BST >
-BSTIterator< BST >
-BSTIterator< BST >::operator++( int )
+template< typename BST, typename T >
+BSTIterator< BST, T >::~BSTIterator( void )
+{}
+
+template< typename BST, typename T >
+// typename BSTIterator< BST, T >::reference
+typename BSTIterator< BST, T >::reference
+BSTIterator< BST, T >::operator*( void )
+{
+	return _curr->indirection();
+}
+
+template< typename BST, typename T >
+typename BSTIterator< BST, T >::pointer
+BSTIterator< BST, T >::operator->( void )
+{
+	return _curr->member_of_pointer();
+}
+
+template< typename BST, typename T >
+BSTIterator< BST, T >&
+BSTIterator< BST, T >::operator++( void )
+{
+	if (_curr)
+	{
+		_curr = _curr->successor();
+		if (_curr)
+			_value = _curr->member_of_pointer();
+		else
+			_value = NULL;
+	}
+	return *this;
+}
+
+template< typename BST, typename T >
+BSTIterator< BST, T >
+BSTIterator< BST, T >::operator++( int )
 {
 	BSTIterator ret = *this;
-	_node = _node->successor();
+	operator++();
 	return ret;
 }
 
-template< typename BST >
-BSTIterator< BST >&
-BSTIterator< BST >::operator--( void )
+template< typename BST, typename T >
+BSTIterator< BST, T >&
+BSTIterator< BST, T >::operator--( void )
 {
-	_node = _node->predecessor();
+	if (!_curr)
+	{
+		_curr = _root->maximum();
+		_value = _curr->member_of_pointer();
+		return *this;
+	}
+	_curr = _curr->predecessor();
+	_value = _curr->member_of_pointer();
 	return *this;
 }
 
-template< typename BST >
-BSTIterator< BST >
-BSTIterator< BST >::operator--( int )
+template< typename BST, typename T >
+BSTIterator< BST, T >
+BSTIterator< BST, T >::operator--( int )
 {
 	BSTIterator ret = *this;
-	_node = _node->predecessor();
+	operator--();
 	return ret;
 }
 
@@ -130,18 +152,18 @@ BSTIterator< BST >::operator--( int )
 namespace ft
 {
 
-template< typename BST >
+template< typename BST, typename T >
 bool
-operator==( const BSTIterator< BST >& lhs, const BSTIterator< BST >& rhs )
+operator==( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
 {
-	return ( lhs._node == rhs._node );
+	return ((lhs._curr == rhs._curr ) && ( lhs._root == rhs._root));
 }
 
-template< typename BST >
+template< typename BST, typename T >
 bool
-operator!=( const BSTIterator< BST >& lhs, const BSTIterator< BST >& rhs )
+operator!=( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
 {
-	return !( lhs._node == rhs._node );
+	return !( lhs == rhs );
 }
 
 } // namespace ft
