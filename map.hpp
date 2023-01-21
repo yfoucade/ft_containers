@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/20 23:43:44 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/21 09:41:09 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include "BinarySearchTree.hpp"
 #include "iterator.hpp"
 #include "pair.hpp"
@@ -170,5 +171,33 @@ map<Key, T, Compare, Allocator>::get_allocator( void ) const
 {
 	return _alloc;
 }
+
+
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+T& map<Key, T, Compare, Allocator>::at( const Key& key )
+{
+	BinarySearchTree<Key, value_type, Compare>* res = _bst.find(key);
+	if (!res)
+		throw std::out_of_range("Key <key> not found in map\n");
+	return res->get_value()->second;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
+{
+	BinarySearchTree<Key, value_type, Compare>* res = _bst.find(key);
+	if (!res)
+		throw std::out_of_range("Key <key> not found in map\n");
+	return res->get_value()->second;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+T& map<Key, T, Compare, Allocator>::operator[]( const Key& key )
+{
+	ft::pair<iterator, bool> ret = insert(ft::pair<key, T()>);
+	return ret.first->second;
+}
+
 
 } // namespace ft
