@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/14 15:23:33 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/19 18:37:33 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,13 @@ int main( void )
 
 	std::map< char, int >::iterator j = ++m.begin();
 	std::map< char, int >::iterator i;
+	std::map< char, int >::reverse_iterator r = m.rbegin();
 	for (i = m.begin(); i != m.end(); ++i)
 	{
 		std::cout << (&*i) << ": " << i->first << ", " << (*i).second << std::endl;
+		i->second += 1;
+		std::cout << (&*i) << ": " << i->first << ", " << (*i).second << std::endl;
+		break;
 	}
 	// data is not contiguous in memory, it is not sorted in memory neither.
 }
