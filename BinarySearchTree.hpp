@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/17 12:48:27 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/20 11:10:58 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <functional>
 #include "BSTIterator.hpp"
+#include "pair.hpp"
 
 namespace ft
 {
@@ -25,21 +26,27 @@ template<
 	typename Compare = std::less<Key>
 > class BinarySearchTree
 {
+	public:
+		typedef Key key_type;
+		typedef T mapped_type;
+		typedef ft::pair<const Key, T> value_type;
+		typedef value_type* value_pointer;
+		typedef value_type& value_reference;
+		typedef value_type& indirection_type;
+		typedef value_type* member_of_pointer_type;
+		typedef BSTIterator< BinarySearchTree<Key, T, Compare>, value_type > iterator;
+		typedef BSTIterator< BinarySearchTree<Key, T, Compare>, const value_type > const_iterator;
+
 	private:
-		Key _key;
-		T *_value;
-		BinarySearchTree *_parent;
-		BinarySearchTree *_left;
-		BinarySearchTree *_right;
+		value_type* _value;
+		BinarySearchTree* _parent;
+		BinarySearchTree* _left;
+		BinarySearchTree* _right;
 		Compare key_compare;
 		BinarySearchTree( void );
 
 	public:
-		typedef T& indirection_type;
-		typedef T* member_of_pointer_type;
-		typedef BSTIterator< BinarySearchTree<Key, void, Compare> > iterator;
-		BinarySearchTree( const Key& key );
-		BinarySearchTree( const Key& key, T* value );
+		BinarySearchTree( value_type* value );
 		BinarySearchTree( const BinarySearchTree& other );
 		BinarySearchTree& operator=( const BinarySearchTree& other );
 		~BinarySearchTree( void );
@@ -61,21 +68,14 @@ template<
 		BinarySearchTree* remove( void );
 		Key get_key( void ) const;
 		T *get_value( void ) const;
+		BinarySearchTree* get_left( void );
+		BinarySearchTree* get_right( void );
 		indirection_type indirection( void );
 		member_of_pointer_type member_of_pointer( void );
 };
 
 template< typename Key, typename T, typename Compare >
-BinarySearchTree< Key, T, Compare >::BinarySearchTree( const Key& key ):
-_key(key),
-_value(NULL),
-_parent(NULL),
-_left(NULL),
-_right(NULL){}
-
-template< typename Key, typename T, typename Compare >
-BinarySearchTree< Key, T, Compare >::BinarySearchTree( const Key& key, T *value ):
-_key(key),
+BinarySearchTree< Key, T, Compare >::BinarySearchTree( value_type* value ):
 _value(value),
 _parent(NULL),
 _left(NULL),
@@ -83,22 +83,20 @@ _right(NULL){}
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >::BinarySearchTree( const BinarySearchTree& other ):
-_key(other._key),
 _value(other._value),
-_parent(other._parent),
-_left(other._left),
-_right(other._right){}
+_parent(NULL),
+_left(NULL),
+_right(NULL){}
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >& BinarySearchTree< Key, T, Compare >::operator=( const BinarySearchTree& other )
 {
 	if (this == &other)
 		return *this;
-	_key = other._key;
 	_value = other._value;
-	_parent = other._parent;
-	_left = other._left;
-	_right = other._right;
+	_parent = NULL;
+	_left = NULL;
+	_right = NULL;
 	return *this;
 }
 
@@ -119,9 +117,9 @@ BinarySearchTree< Key, T, Compare >::search( const Key& key )
 	BinarySearchTree *res = this;
 	while ( res )
 	{
-		if ( key_compare(res->_key, key) )
+		if ( key_compare(res->get_key(), key) )
 			res = res->_right;
-		else if ( key_compare(key, res->_key) )
+		else if ( key_compare(key, res->get_key()) )
 			res = res->_left;
 		else
 			break;
@@ -136,9 +134,9 @@ BinarySearchTree< Key, T, Compare >::search( const Key& key ) const
 	BinarySearchTree *res = this;
 	while ( res )
 	{
-		if ( key_compare(res->_key, key) )
+		if ( key_compare(res->get_key(), key) )
 			res = res->_right;
-		else if ( key_compare(key, res->_key) )
+		else if ( key_compare(key, res->get_key()) )
 			res = res->_left;
 		else
 			break;
@@ -274,10 +272,10 @@ BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree& other )
 	while (leading)
 	{
 		trailing = leading;
-		leading = key_compare(leading->_key, other._key) ? leading->_right : leading->_left;
+		leading = key_compare(leading->get_key(), other.get_key()) ? leading->_right : leading->_left;
 	}
 	other._parent = trailing;
-	if ( key_compare(trailing->_key, other._key) )
+	if ( key_compare(trailing->get_key(), other.get_key()) )
 		trailing->_right = &other;
 	else
 		trailing->_left = &other;
@@ -329,14 +327,14 @@ template< typename Key, typename T, typename Compare >
 Key
 BinarySearchTree< Key, T, Compare >::get_key( void ) const
 {
-	return _key;
+	return _value->first;
 }
 
 template< typename Key, typename T, typename Compare >
 T*
 BinarySearchTree< Key, T, Compare >::get_value( void ) const
 {
-	return _value;
+	return _value->second;
 }
 
 
@@ -344,7 +342,7 @@ template< typename Key, typename T, typename Compare >
 typename BinarySearchTree<Key, T, Compare>::indirection_type
 BinarySearchTree<Key, T, Compare>::indirection( void )
 {
-	return _value;
+	return *_value;
 }
 
 template< typename Key, typename T, typename Compare >
@@ -375,6 +373,15 @@ namespace ft
 template< typename Key, typename Compare >
 class BinarySearchTree<Key, void, Compare>
 {
+	public:
+		typedef Key key_type;
+		typedef const Key value_type;
+		typedef value_type* value_pointer;
+		typedef value_type& value_reference;
+		typedef value_type& indirection_type;
+		typedef value_type* member_of_pointer_type;
+		typedef BSTIterator< BinarySearchTree<Key, void, Compare>, value_type > iterator;
+
 	private:
 		Key _key;
 		BinarySearchTree *_parent;
@@ -384,9 +391,6 @@ class BinarySearchTree<Key, void, Compare>
 		BinarySearchTree( void );
 
 	public:
-		typedef Key& indirection_type;
-		typedef Key* member_of_pointer_type;
-		typedef BSTIterator< BinarySearchTree<Key, void, Compare> > iterator;
 		BinarySearchTree( const Key& key );
 		BinarySearchTree( const BinarySearchTree& other );
 		BinarySearchTree& operator=( const BinarySearchTree& other );
@@ -421,9 +425,9 @@ _right(NULL){}
 template< typename Key, typename Compare >
 BinarySearchTree< Key, void, Compare >::BinarySearchTree( const BinarySearchTree& other ):
 _key(other._key),
-_parent(other._parent),
-_left(other._left),
-_right(other._right){}
+_parent(NULL),
+_left(NULL),
+_right(NULL){}
 
 template< typename Key, typename Compare >
 BinarySearchTree< Key, void, Compare >& BinarySearchTree< Key, void, Compare >::operator=( const BinarySearchTree& other )
@@ -431,9 +435,9 @@ BinarySearchTree< Key, void, Compare >& BinarySearchTree< Key, void, Compare >::
 	if (this == &other)
 		return *this;
 	_key = other._key;
-	_parent = other._parent;
-	_left = other._left;
-	_right = other._right;
+	_parent = NULL;
+	_left = NULL;
+	_right = NULL;
 	return *this;
 }
 
@@ -667,6 +671,16 @@ BinarySearchTree< Key, void, Compare >::get_key( void ) const
 {
 	return _key;
 }
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree<Key, T, Compare>*
+BinarySearchTree<Key, T, Compare>::get_left( void )
+{ return _left; }
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree<Key, T, Compare>*
+BinarySearchTree<Key, T, Compare>::get_right( void )
+{ return _right; }
 
 template< typename Key, typename Compare >
 typename BinarySearchTree<Key, void, Compare>::indirection_type
