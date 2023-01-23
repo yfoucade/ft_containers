@@ -6,13 +6,37 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/21 09:35:57 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/23 14:35:56 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iostream>
 #include <map>
 
+void test_iterators( void )
+{
+	std::cout << "test_iterators\n";
+	// are all past-the-end iterators equal ?
+	std::map< char, int > m1;
+	std::map< char, int > m2;
+	std::map< char, int > m3;
+	std::map< char, int > m4;
+
+	m1['a']; m1['b'];
+	m2['c']; m2['d']; m2['e'];
+	std::cout << (m1.end() == m2.end()) << std::endl;
+	std::cout << (m3.end() == m4.end()) << std::endl;
+	std::map<char, int>::iterator it = m3.begin();
+	std::pair<const char, int> a = *(m3.end());
+	std::cout << (int)a.first << a.second << std::endl;
+	if (it->second)
+		std::cout << "ok\n";
+	else
+		std::cout << "ko\n";
+	m3['z'];
+	--it;
+	std::cout << it->first << std::endl;
+}
 void test_insert( void )
 {
 	// map.insert() copies the values
@@ -48,4 +72,5 @@ int main( void )
 	}
 	// data is not contiguous in memory, it is not sorted in memory neither.
 	test_insert();
+	test_iterators();
 }
