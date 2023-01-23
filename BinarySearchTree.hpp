@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/20 11:10:58 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/21 14:34:49 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ template<
 		T *get_value( void ) const;
 		BinarySearchTree* get_left( void );
 		BinarySearchTree* get_right( void );
+		BinarySearchTree* get_parent( void );
 		indirection_type indirection( void );
 		member_of_pointer_type member_of_pointer( void );
 };
@@ -681,6 +682,11 @@ template< typename Key, typename T, typename Compare >
 BinarySearchTree<Key, T, Compare>*
 BinarySearchTree<Key, T, Compare>::get_right( void )
 { return _right; }
+
+template< typename Key, typename T, typename Compare >
+BinarySearchTree<Key, T, Compare>*
+BinarySearchTree<Key, T, Compare>::get_parent( void )
+{ return _parent; }
 
 template< typename Key, typename Compare >
 typename BinarySearchTree<Key, void, Compare>::indirection_type
