@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/19 19:21:28 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/23 14:36:36 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,14 @@ template<
 		typedef std::bidirectional_iterator_tag iterator_category;
 		typedef T& indirection_type;
 		typedef T* member_of_pointer_type;
+		BSTIterator( void );
 
 	private:
-		BST* _root;
+		BST** _root;
 		BST* _curr;
-		pointer _value;
 
 	public:
-		BSTIterator( void );
-		BSTIterator( BST* node );
+		BSTIterator( BST** root );
 		BSTIterator( const BSTIterator& other );
 		BSTIterator& operator=( const BSTIterator& other );
 		~BSTIterator( void );
@@ -57,15 +56,15 @@ template<
 
 template< typename BST, typename T >
 BSTIterator< BST, T >::BSTIterator( void ):
-_root(NULL), _curr(NULL), _value(NULL){}
+_root(NULL), _curr(NULL){}
 
 template< typename BST, typename T >
-BSTIterator< BST, T >::BSTIterator( BST* node ):
-_root(node->get_root()), _curr(node), _value(node->member_of_pointer()){}
+BSTIterator< BST, T >::BSTIterator( BST** root ):
+_root(root), _curr(*root){}
 
 template< typename BST, typename T >
 BSTIterator< BST, T >::BSTIterator( const BSTIterator& other ):
-_root(other._root), _curr(other._curr), _value(other._value){}
+_root(other._root), _curr(other._curr){}
 
 template< typename BST, typename T >
 BSTIterator< BST, T >&
@@ -75,7 +74,6 @@ BSTIterator< BST, T >::operator=( const BSTIterator& other )
 		return *this;
 	_root = other._root;
 	_curr = other._curr;
-	_value = other._value;
 	return *this;
 }
 
@@ -84,7 +82,6 @@ BSTIterator< BST, T >::~BSTIterator( void )
 {}
 
 template< typename BST, typename T >
-// typename BSTIterator< BST, T >::reference
 typename BSTIterator< BST, T >::reference
 BSTIterator< BST, T >::operator*( void )
 {
@@ -103,13 +100,7 @@ BSTIterator< BST, T >&
 BSTIterator< BST, T >::operator++( void )
 {
 	if (_curr)
-	{
 		_curr = _curr->successor();
-		if (_curr)
-			_value = _curr->member_of_pointer();
-		else
-			_value = NULL;
-	}
 	return *this;
 }
 
@@ -127,13 +118,9 @@ BSTIterator< BST, T >&
 BSTIterator< BST, T >::operator--( void )
 {
 	if (!_curr)
-	{
-		_curr = _root->maximum();
-		_value = _curr->member_of_pointer();
-		return *this;
-	}
-	_curr = _curr->predecessor();
-	_value = _curr->member_of_pointer();
+		_curr = *_root->maximum();
+	else
+		_curr = _curr->predecessor();
 	return *this;
 }
 
@@ -156,7 +143,7 @@ template< typename BST, typename T >
 bool
 operator==( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
 {
-	return ((lhs._curr == rhs._curr ) && ( lhs._root == rhs._root));
+	return ((lhs._curr == rhs._curr ) && (lhs._root == rhs._root));
 }
 
 template< typename BST, typename T >
