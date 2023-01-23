@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/21 09:41:09 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/23 14:29:37 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include "iterator.hpp"
 #include "pair.hpp"
 
+// store a pointer to the root (BST** _root), and share its address with the iterator.
+// This way a past-the-end iterator (because tree is empty), can be decremented after
+// tree has been grown.
 namespace ft
 {
 
@@ -48,16 +51,21 @@ template<
 
 	// private members
 	private:
-		BinarySearchTree* _bst;
+		BinarySearchTree** _bst;
 		key_compare _comp;
 		allocator_type _alloc;
+		size_type _size;
 		size_type _required_alloc_size;
 		void destroy_tree(BinarySearchTree<Key, value_type, Compare>* bst);
+		size_type compute_ras( void );
 
 	// member classes
 	public:
 		class value_compare: public std::binary_function<value_type, value_type, bool>
 		{
+			public:
+				typedef result_type;
+
 			protected:
 				Compare comp;
 				value_compare( Compare c );
@@ -81,6 +89,22 @@ template<
 		T& at( const Key& key );
 		const T& at( const Key& key ) const;
 		T& operator[]( const Key& key );
+		// iterators
+		iterator begin( void );
+		const_iterator begin( void ) const;
+		iterator end( void );
+		const_iterator end( void ) const;
+		reverse_iterator rbegin( void );
+		const_reverse_iterator rbegin( void ) const;
+		reverse_iterator rend( void );
+		const_reverse_iterator rend( void ) const;
+		// capacity
+		bool empty() const;
+		size_type size() const;
+		size_type max_size() const;
+		// modifiers
+		// lookup
+		// observers
 };
 
 } // namespace ft
@@ -98,32 +122,41 @@ map<Key, T, Compare, Allocator>::value_compare::operator()(
 ){ return comp(lhs.first, rhs.first); }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
-map<Key, T, Compare, Allocator>::map( void ): _bst(NULL){}
+map<Key, T, Compare, Allocator>::map( void ):
+_bst(new BinarySearchTree<Key, value_type, Compare>*), _size(0),
+_required_alloc_size(compute_ras())
+{ *_bst = NULL; }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::map( const Compare& comp, const Allocator& alloc ):
-_bst(NULL), _comp(comp), _alloc(alloc){}
+_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(comp), _alloc(alloc),
+_size(0), _required_alloc_size(compute_ras())
+{ *_bst = NULL; }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 template< typename InputIt >
 map<Key, T, Compare, Allocator>::map(
 	InputIt first, InputIt last, const Compare& comp, const Allocator& alloc ):
-_bst(NULL), _comp(comp), _alloc(alloc)
+_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(comp), _alloc(alloc),
+_size(0), _required_alloc_size(compute_ras())
 {
+	*_bst = NULL;
 	insert(first, last);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::map( const map& other ):
-_bst(NULL), _comp(other._comp), _alloc(other._alloc)
+_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(other._comp), _alloc(other._alloc), _size(0)
 {
+	*_bst = NULL;
 	*this = other;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::~map( void )
 {
-	destroy_tree(_bst);
+	destroy_tree(*_bst);
+	*_bst = NULL;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -137,6 +170,7 @@ map<Key, T, Compare, Allocator>::destroy_tree( BinarySearchTree<Key, value_type,
 		bst->get_value()->~value_type();
 		_alloc->deallocate(bst->get_value(), _required_alloc_size);
 		delete bst;
+		--_size;
 	}
 }
 
@@ -147,12 +181,11 @@ map<Key, T, Compare, Allocator>::operator=( const map& other )
 	if (this == &other)
 		return *this;
 	~map();
-	_bst = NULL;
 	_comp = other._comp;
 	_alloc = other._alloc;
-	_required_alloc_size = compute_ras();
+	_size = 0;
+	_required_alloc_size = other._required_alloc_size;
 	value_type* tmp;
-	BinarySearchTree<Key, value_type, Compare>* new_node;
 	iterator first = other.begin();
 	iterator last = other.end();
 	while (first != last)
@@ -177,7 +210,7 @@ map<Key, T, Compare, Allocator>::get_allocator( void ) const
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::at( const Key& key )
 {
-	BinarySearchTree<Key, value_type, Compare>* res = _bst.find(key);
+	BinarySearchTree<Key, value_type, Compare>* res = (*_bst).find(key);
 	if (!res)
 		throw std::out_of_range("Key <key> not found in map\n");
 	return res->get_value()->second;
@@ -186,7 +219,7 @@ T& map<Key, T, Compare, Allocator>::at( const Key& key )
 template< typename Key, typename T, typename Compare, typename Allocator >
 const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 {
-	BinarySearchTree<Key, value_type, Compare>* res = _bst.find(key);
+	BinarySearchTree<Key, value_type, Compare>* res = *_bst.find(key);
 	if (!res)
 		throw std::out_of_range("Key <key> not found in map\n");
 	return res->get_value()->second;
@@ -199,5 +232,104 @@ T& map<Key, T, Compare, Allocator>::operator[]( const Key& key )
 	return ret.first->second;
 }
 
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::begin( void )
+{
+	return iterator(_bst);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::begin( void ) const
+{
+	return iterator(_bst);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::end( void )
+{
+	if (*_bst)
+		return ++iterator(*_bst.maximum());
+	return iterator(_bst);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::end( void ) const
+{
+	if (*_bst)
+		return ++iterator(*_bst.maximum());
+	return iterator(_bst);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::reverse_iterator
+map<Key, T, Compare, Allocator>::rbegin( void )
+{
+	return ft::reverse_iterator<iterator>(end());
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_reverse_iterator
+map<Key, T, Compare, Allocator>::rbegin( void ) const
+{
+	return ft::reverse_iterator<const_iterator>(end());
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::reverse_iterator
+map<Key, T, Compare, Allocator>::rend( void )
+{
+	return ft::reverse_iterator<iterator>(begin());
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_reverse_iterator
+map<Key, T, Compare, Allocator>::rend( void ) const
+{
+	return ft::reverse_iterator<const_iterator>(begin());
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+bool map<Key, T, Compare, Allocator>::empty( void ) const
+{
+	return _size == 0;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::size() const
+{
+	return _size;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::max_size() const
+{
+	return std::numeric_limits<difference_type>::max() / sizeof(value_type);
+}
+
+} // namespace ft
+
+namespace ft
+{
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::compute_ras( void )
+{
+	size_type alloc_size = sizeof(typename Allocator::value_type);
+	size_type target = sizeof(value_type);
+	if (alloc_size >= target)
+		return 1;
+	size_type n_elem = target / alloc_size;
+	if (n_elem * alloc_size == target)
+		return n_elem;
+	return n_elem + 1;
+}
 
 } // namespace ft
