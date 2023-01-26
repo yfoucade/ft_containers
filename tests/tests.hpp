@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:01:21 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/10 13:20:03 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/26 22:44:07 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ ft::vector< int > range_vector(int min, int max);
 void	test_capacity( void );
 void	test_modifiers( void );
 void	test_non_member( void );
+
+void test_constructor( void );
 
 template< typename Container >
 void print_content( Container c, char sep )
@@ -47,4 +49,19 @@ void test_const_access( const ft::vector< T > v )
 	std::cout << "v.back() = " << v.back() << std::endl;
 	std::cout << "*(v.data() + 3) = " << *(v.data() + 3) << std::endl;
 	std::cout << std::endl;
+}
+
+template< typename T >
+class EvenFirst
+{
+	public:
+		bool operator()( const T& lhs, const T& rhs );
+};
+
+template< typename T >
+bool EvenFirst<T>::operator()( const T& lhs, const T& rhs )
+{
+	if ( ( lhs % 2 == 0 ) && ( rhs % 2 ) )
+		return true;
+	return lhs < rhs;
 }
