@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/01 12:00:15 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/17 19:43:10 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/26 19:19:05 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ pair<T1, T2>& pair<T1, T2>::operator=( const pair& other )
 {
 	if (this == &other)
 		return *this;
-	T1::~T1(first);
-	T2::~T2(second);
+	first.~T1();
+	second.~T2();
 	first = T1(other.first);
 	second = T2(other.second);
 	return *this;
