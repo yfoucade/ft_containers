@@ -1,5 +1,6 @@
 NAME = containers
 VECTOR = tests/test_vector
+MAP = tests/test_map
 
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g
@@ -12,7 +13,7 @@ SRC = main.cpp
 OBJ = ${SRC:.cpp=.o}
 
 TEST_VECTOR = tests/test_vector
-TESTS_VECTOR_OBJ = \
+TEST_VECTOR_OBJ = \
 	tests/test_vector.o \
 	tests/vector_constructor.o \
 	tests/vector_access.o \
@@ -21,6 +22,11 @@ TESTS_VECTOR_OBJ = \
 	tests/vector_capacity.o \
 	tests/vector_modifiers.o \
 	tests/vector_non_member.o \
+
+TEST_MAP = tests/test_map
+TEST_MAP_OBJ = \
+	tests/test_map.o \
+	tests/map_constructor.o \
 
 .PHONY = all clean fclean re
 
@@ -35,8 +41,8 @@ ${NAME}: ${OBJ}
 clean:
 	${RM} ${OBJ}
 	${RM} ${SRC:.cpp=.d}
-	${RM} ${TESTS_VECTOR_OBJ:.o=.d}
-	${RM} ${TESTS_VECTOR_OBJ}
+	${RM} ${TEST_VECTOR_OBJ:.o=.d}
+	${RM} ${TEST_VECTOR_OBJ}
 
 fclean: clean
 	${RM} ${NAME}
@@ -44,7 +50,10 @@ fclean: clean
 
 re: fclean all
 
-${VECTOR}: ${TESTS_VECTOR_OBJ}
-	${CXX} ${CXXFLAGS} -I. -o $@ ${TESTS_VECTOR_OBJ}
+${VECTOR}: ${TEST_VECTOR_OBJ}
+	${CXX} ${CXXFLAGS} -I. -o $@ ${TEST_VECTOR_OBJ}
 
--include ${SRC:.cpp=.d} ${TESTS_VECTOR_OBJ:.o=.d}
+${MAP}: ${TEST_MAP_OBJ}
+	${CXX} ${CXXFLAGS} -I. -o $@ ${TEST_MAP_OBJ}
+
+-include ${SRC:.cpp=.d} ${TEST_VECTOR_OBJ:.o=.d} ${TEST_MAP_OBJ:.o=.d}
