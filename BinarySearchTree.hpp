@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/21 14:34:49 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/26 19:01:11 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ template<
 {
 	public:
 		typedef Key key_type;
-		typedef T mapped_type;
-		typedef ft::pair<const Key, T> value_type;
+		typedef T value_type;
 		typedef value_type* value_pointer;
 		typedef value_type& value_reference;
 		typedef value_type& indirection_type;
@@ -61,13 +60,13 @@ template<
 		BinarySearchTree* successor( void ) const;
 		BinarySearchTree* predecessor( void );
 		BinarySearchTree* predecessor( void ) const;
-		void insert( BinarySearchTree& other );
+		void insert( BinarySearchTree* other );
 		// void insert( const Key& key );
 		// void insert( const Key& key, T* value );
 		BinarySearchTree* transplant( BinarySearchTree* other );
 		BinarySearchTree* remove( void );
 		Key get_key( void ) const;
-		T *get_value( void ) const;
+		value_type* get_value( void );
 		BinarySearchTree* get_left( void );
 		BinarySearchTree* get_right( void );
 		BinarySearchTree* get_parent( void );
@@ -265,7 +264,7 @@ BinarySearchTree< Key, T, Compare >::predecessor( void ) const
 
 template< typename Key, typename T, typename Compare >
 void
-BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree& other )
+BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree* other )
 {
 	BinarySearchTree *leading = this;
 	BinarySearchTree *trailing = NULL;
@@ -273,13 +272,13 @@ BinarySearchTree< Key, T, Compare >::insert( BinarySearchTree& other )
 	while (leading)
 	{
 		trailing = leading;
-		leading = key_compare(leading->get_key(), other.get_key()) ? leading->_right : leading->_left;
+		leading = key_compare(leading->get_key(), other->get_key()) ? leading->_right : leading->_left;
 	}
-	other._parent = trailing;
-	if ( key_compare(trailing->get_key(), other.get_key()) )
-		trailing->_right = &other;
+	other->_parent = trailing;
+	if ( key_compare(trailing->get_key(), other->get_key()) )
+		trailing->_right = other;
 	else
-		trailing->_left = &other;
+		trailing->_left = other;
 }
 
 template< typename Key, typename T, typename Compare >
@@ -332,10 +331,10 @@ BinarySearchTree< Key, T, Compare >::get_key( void ) const
 }
 
 template< typename Key, typename T, typename Compare >
-T*
-BinarySearchTree< Key, T, Compare >::get_value( void ) const
+typename BinarySearchTree<Key, T, Compare>::value_type*
+BinarySearchTree< Key, T, Compare >::get_value( void )
 {
-	return _value->second;
+	return _value;
 }
 
 
@@ -358,13 +357,13 @@ BinarySearchTree<Key, T, Compare>::member_of_pointer( void )
 namespace ft
 {
 
-template< typename Key, typename Compare = std::less< Key > >
-bool
-equiv( const Key& k1, const Key& k2 )
-{
-	Compare comp{};
-	return (!comp(k1, k2) && !comp(k2, k1) );
-}
+// template< typename Key, typename Compare = std::less< Key > >
+// bool
+// equiv( const Key& k1, const Key& k2 )
+// {
+// 	Compare comp{};
+// 	return (!comp(k1, k2) && !comp(k2, k1) );
+// }
 
 } // namespace ft
 
