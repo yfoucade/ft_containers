@@ -6,12 +6,13 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/23 14:29:37 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/26 22:58:48 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <limits>
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -35,7 +36,7 @@ template<
 	public:
 		typedef Key key_type;
 		typedef T mapped_type;
-		typedef std::pair<const Key, T> value_type;
+		typedef ft::pair<const Key, T> value_type;
 		typedef std::size_t size_type;
 		typedef std::ptrdiff_t difference_type;
 		typedef Compare key_compare;
@@ -51,7 +52,7 @@ template<
 
 	// private members
 	private:
-		BinarySearchTree** _bst;
+		BinarySearchTree<Key, value_type, Compare>** _bst;
 		key_compare _comp;
 		allocator_type _alloc;
 		size_type _size;
@@ -64,7 +65,7 @@ template<
 		class value_compare: public std::binary_function<value_type, value_type, bool>
 		{
 			public:
-				typedef result_type;
+				typedef typename std::binary_function<value_type, value_type, bool>::result_type result_type;
 
 			protected:
 				Compare comp;
@@ -103,7 +104,25 @@ template<
 		size_type size() const;
 		size_type max_size() const;
 		// modifiers
+		void clear();
+		ft::pair<iterator, bool> insert( const value_type& value );
+		iterator insert( iterator pos, const value_type& value );
+		template< class InputIt >
+		void insert( InputIt first, InputIt last );
+		void erase( iterator pos );
+		void erase( iterator first, iterator last );
+		size_type erase( const Key& key );
+		void swap( map& other );
 		// lookup
+		size_type count( const Key& key ) const;
+		iterator find( const Key& key );
+		const_iterator find( const Key& key ) const;
+		// std::pair<iterator,iterator> equal_range( const Key& key );
+		// std::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+		// iterator lower_bound( const Key& key );
+		// const_iterator lower_bound( const Key& key ) const;
+		// iterator upper_bound( const Key& key );
+		// const_iterator upper_bound( const Key& key ) const;
 		// observers
 };
 
@@ -168,7 +187,8 @@ map<Key, T, Compare, Allocator>::destroy_tree( BinarySearchTree<Key, value_type,
 		destroy_tree(bst->get_left());
 		destroy_tree(bst->get_right());
 		bst->get_value()->~value_type();
-		_alloc->deallocate(bst->get_value(), _required_alloc_size);
+		// _alloc.deallocate(bst->get_value(), _required_alloc_size);
+		_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(bst->get_value()), _required_alloc_size);
 		delete bst;
 		--_size;
 	}
@@ -185,16 +205,10 @@ map<Key, T, Compare, Allocator>::operator=( const map& other )
 	_alloc = other._alloc;
 	_size = 0;
 	_required_alloc_size = other._required_alloc_size;
-	value_type* tmp;
 	iterator first = other.begin();
 	iterator last = other.end();
 	while (first != last)
-	{
-		tmp = reinterpret_cast<value_type*>(_alloc.allocate(_required_alloc_size));
-		tmp = *first;
-		insert(*tmp);
-		++first;
-	}
+		insert(*first++);
 	return *this;
 }
 
@@ -213,7 +227,7 @@ T& map<Key, T, Compare, Allocator>::at( const Key& key )
 	BinarySearchTree<Key, value_type, Compare>* res = (*_bst).find(key);
 	if (!res)
 		throw std::out_of_range("Key <key> not found in map\n");
-	return res->get_value()->second;
+	return res->get_value().second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -222,14 +236,20 @@ const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 	BinarySearchTree<Key, value_type, Compare>* res = *_bst.find(key);
 	if (!res)
 		throw std::out_of_range("Key <key> not found in map\n");
-	return res->get_value()->second;
+	return res->get_value().second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::operator[]( const Key& key )
 {
-	ft::pair<iterator, bool> ret = insert(ft::pair<key, T()>);
-	return ret.first->second;
+	std::cout << "map::operator[], key = '" << key << "'\n";
+	std::cout << "trying to insert element\n";
+	ft::pair<iterator, bool> ret = insert(ft::pair<const Key, T>(key, T()));
+	if (ret.second)
+		std::cout << "element has been inserted\n";
+	else
+		std::cout << "element was already in map\n";
+	return (*(ret.first)).second;
 }
 
 
@@ -252,7 +272,7 @@ typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::end( void )
 {
 	if (*_bst)
-		return ++iterator(*_bst.maximum());
+		return ++iterator(_bst, (*_bst)->maximum());
 	return iterator(_bst);
 }
 
@@ -261,7 +281,7 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::end( void ) const
 {
 	if (*_bst)
-		return ++iterator(*_bst.maximum());
+		return ++iterator(_bst, (*_bst)->maximum());
 	return iterator(_bst);
 }
 
@@ -312,6 +332,132 @@ map<Key, T, Compare, Allocator>::max_size() const
 {
 	return std::numeric_limits<difference_type>::max() / sizeof(value_type);
 }
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+void map<Key, T, Compare, Allocator>::clear( void )
+{
+	destroy_tree(*_bst);
+	*_bst = NULL;
+	_size = 0;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+ft::pair<typename map<Key, T, Compare, Allocator>::iterator, bool>
+map<Key, T, Compare, Allocator>::insert( const value_type& value )
+{
+	std::cout << "map::insert\n";
+	iterator it = find(value.first);
+	if (it != end())
+	{
+		std::cout << "element was found in map\n";
+		return ft::pair<iterator, bool>(it, false);
+	}
+	else
+		std::cout << "key was not found in map\n";
+	value_type* new_value = reinterpret_cast<value_type*>(_alloc.allocate(_required_alloc_size));
+	// _alloc.construct(new_value, value);
+	new((void *)new_value) value_type(value);
+	BinarySearchTree<Key, value_type, Compare>* node = new BinarySearchTree<Key, value_type, Compare>(new_value);
+	if (!*_bst)
+		*_bst = node;
+	else
+		(*_bst)->insert(node);
+	++_size;
+	return ft::pair<iterator, bool>(iterator(_bst, node), true);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::insert( iterator pos, const value_type& value )
+{
+	return insert(value).first;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+template< class InputIt >
+void map<Key, T, Compare, Allocator>::insert( InputIt first, InputIt last )
+{
+	while (first != last)
+		insert(*first++);
+}
+
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+void map<Key, T, Compare, Allocator>::erase( iterator pos )
+{
+	pos->remove();
+	--_size;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+void map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
+{
+	while (first != last)
+	{
+		first++->remove();
+		--_size;
+	}
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::erase( const Key& key )
+{
+	BinarySearchTree<Key, value_type, Compare>* node = (*_bst).find(key);
+	if (node)
+	{
+		node->remove();
+		--_size;
+		return 1;
+	}
+	return 0;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+void map<Key, T, Compare, Allocator>::swap( map& other )
+{
+	BinarySearchTree<Key, value_type, Compare>* tmp_bst = *_bst;
+	key_compare tmp_comp = _comp;
+	allocator_type tmp_alloc = _alloc;
+	size_type tmp_size = _size;
+	size_type tmp_required_alloc_size = _required_alloc_size;
+	
+	*_bst = *(other._bst);
+	_comp = other._comp;
+	_alloc = other._alloc;
+	_size = other._size;
+	_required_alloc_size = other._required_alloc_size;
+
+	*(other._bst) = tmp_bst;
+	other._comp = tmp_comp;
+	other._alloc = tmp_alloc;
+	other._size = tmp_size;
+	other._required_alloc_size = tmp_required_alloc_size;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::count( const Key& key ) const
+{
+	if ( (*_bst)->find(key) )
+		return 1;
+	return 0;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::find( const Key& key )
+{
+	return iterator(_bst, (*_bst)->search(key) );
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::find( const Key& key ) const
+{
+	return const_iterator(_bst, (*_bst)->search(key) );
+}
+
 
 } // namespace ft
 
