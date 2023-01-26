@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/23 14:36:36 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/26 18:30:28 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,17 @@ template<
 		typedef std::bidirectional_iterator_tag iterator_category;
 		typedef T& indirection_type;
 		typedef T* member_of_pointer_type;
-		BSTIterator( void );
 
 	private:
 		BST** _root;
 		BST* _curr;
 
 	public:
-		BSTIterator( BST** root );
+		BSTIterator( void );
+		BSTIterator( BST** root, BST* curr = NULL );
 		BSTIterator( const BSTIterator& other );
 		BSTIterator& operator=( const BSTIterator& other );
+		void operator=( BST* new_curr );
 		~BSTIterator( void );
 		template< typename A, typename B >
 		friend bool operator==( const BSTIterator< A, B >&, const BSTIterator< A, B >& );
@@ -59,8 +60,8 @@ BSTIterator< BST, T >::BSTIterator( void ):
 _root(NULL), _curr(NULL){}
 
 template< typename BST, typename T >
-BSTIterator< BST, T >::BSTIterator( BST** root ):
-_root(root), _curr(*root){}
+BSTIterator< BST, T >::BSTIterator( BST** root, BST* curr ):
+_root(root), _curr(curr){}
 
 template< typename BST, typename T >
 BSTIterator< BST, T >::BSTIterator( const BSTIterator& other ):
@@ -75,6 +76,12 @@ BSTIterator< BST, T >::operator=( const BSTIterator& other )
 	_root = other._root;
 	_curr = other._curr;
 	return *this;
+}
+
+template< typename BST, typename T >
+void BSTIterator< BST, T >::operator=( BST* new_curr )
+{
+	_curr = new_curr;
 }
 
 template< typename BST, typename T >
@@ -118,7 +125,7 @@ BSTIterator< BST, T >&
 BSTIterator< BST, T >::operator--( void )
 {
 	if (!_curr)
-		_curr = *_root->maximum();
+		_curr = (*_root)->maximum();
 	else
 		_curr = _curr->predecessor();
 	return *this;
