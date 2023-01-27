@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:01:21 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/26 22:44:07 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 10:59:54 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ class EvenFirst
 template< typename T >
 bool EvenFirst<T>::operator()( const T& lhs, const T& rhs )
 {
-	if ( ( lhs % 2 == 0 ) && ( rhs % 2 ) )
-		return true;
+	if ( ( lhs % 2 ) != ( rhs % 2 ) )
+		return (rhs % 2);
 	return lhs < rhs;
 }

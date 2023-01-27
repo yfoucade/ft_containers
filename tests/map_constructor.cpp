@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 22:18:18 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/26 23:27:47 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 11:53:53 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,81 @@ void test_constructor( void )
 		std::cout << "ft::map<ft::map<char, int>, ft::vector<int>> m4;\n";
 		ft::map< ft::map<char, int>, ft::vector<int> > m4;
 	}
-
 	{
 		std::cout << "constructor with Compare and Allocator\n";
 		EvenFirst<char> comp;
 		std::allocator<char> alloc;
-		std::map<char, int, EvenFirst<char>, std::allocator<char> > m1(comp, alloc);
-		ft::map<char, int, EvenFirst<char>, std::allocator<char> > m2(comp, alloc);
-		std::pair< const char, int > p1('a', 1);
-		ft::pair< const char, int > p2(42, 42);
-		// create several pairs
-		// add them all,
-		// test the order by printing all elements
-		
-		m1.insert(p1);
-		m2.insert(p2);
+		{
+			std::map< char, int, EvenFirst<char>, std::allocator<char> > m(comp, alloc);
+			std::pair< const char, int > p1('a', 97);
+			std::pair< const char, int > p2('*', 42);
+			std::pair< const char, int > p3(104, 104);
+			std::pair< const char, int > p4('A', 65);
+			m.insert(p1); m.insert(p2); m.insert(p3); m.insert(p4);
+			std::map< char, int, EvenFirst<char> >::iterator it = m.begin();
+			std::map< char, int, EvenFirst<char> >::iterator end = m.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+		}
+		{
+			ft::map< char, int, EvenFirst<char>, std::allocator<char> > m(comp, alloc);
+			ft::pair< const char, int > p1('a', 97);
+			ft::pair< const char, int > p2('*', 42);
+			ft::pair< const char, int > p3(104, 104);
+			ft::pair< const char, int > p4('A', 65);
+			m.insert(p1); m.insert(p2); m.insert(p3); m.insert(p4); m.insert(p1);
+			ft::map< char, int, EvenFirst<char> >::iterator it = m.begin();
+			ft::map< char, int, EvenFirst<char> >::iterator end = m.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+		}
 	}
-
+	{
+		std::cout << "constructor with iterators\n";
+		{
+			std::pair< const char, int > p[4] = {
+				std::pair< const char, int >('a', 97),
+				std::pair< const char, int >('*', 42),
+				std::pair< const char, int >(104, 104),
+				std::pair< const char, int >('A', 65)
+			};
+			std::map<char, int> m(p, p+4);
+			std::map< char, int >::iterator it = m.begin();
+			std::map< char, int >::iterator end = m.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+		}
+		{
+			ft::pair< const char, int > p[4] = {
+				ft::pair< const char, int >('a', 97),
+				ft::pair< const char, int >('*', 42),
+				ft::pair< const char, int >(104, 104),
+				ft::pair< const char, int >('A', 65)
+			};
+			ft::map<char, int> m(p, p+4);
+			ft::map< char, int >::iterator it = m.begin();
+			ft::map< char, int >::iterator end = m.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+		}
+	}
+	{
+		std::cout << "copy constructor\n";
+		{
+			ft::pair< const char, int > p[4] = {
+				ft::pair< const char, int >('a', 97),
+				ft::pair< const char, int >('*', 42),
+				ft::pair< const char, int >(104, 104),
+				ft::pair< const char, int >('A', 65)
+			};
+			ft::map<char, int> m(p, p+4);
+			ft::map<char, int> m2(m);
+			ft::map< char, int >::iterator it = m2.begin();
+			ft::map< char, int >::iterator end = m2.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+		}
+	}
 	// ft::map<char, int>::iterator it(m2.begin());
 	// m2['a'] = 1;
 	// --it;
