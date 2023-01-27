@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 19:51:36 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 21:33:23 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ template<
 
 			public:
 				result_type operator()(const value_type& lhs, const value_type& rhs);
+				friend class map;
 		};
 
 	// member functions
