@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 11:53:24 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 18:32:36 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <functional>
 #include <memory>
 #include <stdexcept>
+#include "lexicographical_compare.hpp"
 #include "BinarySearchTree.hpp"
 #include "iterator.hpp"
 #include "pair.hpp"
@@ -117,13 +118,18 @@ template<
 		size_type count( const Key& key ) const;
 		iterator find( const Key& key );
 		const_iterator find( const Key& key ) const;
-		// std::pair<iterator,iterator> equal_range( const Key& key );
-		// std::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
-		// iterator lower_bound( const Key& key );
-		// const_iterator lower_bound( const Key& key ) const;
-		// iterator upper_bound( const Key& key );
-		// const_iterator upper_bound( const Key& key ) const;
+		ft::pair<iterator,iterator> equal_range( const Key& key );
+		ft::pair<const_iterator,const_iterator> equal_range( const Key& key ) const;
+		iterator lower_bound( const Key& key );
+		const_iterator lower_bound( const Key& key ) const;
+		iterator upper_bound( const Key& key );
+		const_iterator upper_bound( const Key& key ) const;
 		// observers
+		key_compare key_comp() const;
+		value_compare value_comp() const;
+		template < class Ke, class Ty, class Co, class Al>
+		friend bool operator<( const map<Ke, Ty, Co, Al>& lhs,
+							   const map<Ke, Ty, Co, Al>& rhs );
 };
 
 } // namespace ft
@@ -448,6 +454,120 @@ map<Key, T, Compare, Allocator>::find( const Key& key ) const
 }
 
 
+template< typename Key, typename T, typename Compare, typename Allocator >
+ft::pair< typename map<Key, T, Compare, Allocator>::iterator, typename map<Key, T, Compare, Allocator>::iterator>
+map<Key, T, Compare, Allocator>::equal_range( const Key& key )
+{
+	return ft::pair<iterator, iterator>(lower_bound(), upper_bound());
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+ft::pair< typename map<Key, T, Compare, Allocator>::const_iterator, typename map<Key, T, Compare, Allocator>::const_iterator >
+map<Key, T, Compare, Allocator>::equal_range( const Key& key ) const
+{
+	return ft::pair<const_iterator, const_iterator>(lower_bound(), upper_bound());
+}
+
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::lower_bound( const Key& key )
+{
+	iterator ret = end();
+	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	while ( tmp )
+	{
+		if ( _comp(tmp->get_value()->first, key) )
+			tmp = tmp->get_right();
+		else if ( _comp(key, tmp->get_value()->first) )
+		{
+			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
+				ret = iterator(_bst, tmp);
+			tmp = tmp->get_left();
+		}
+		else
+			return iterator(_bst, tmp);
+	}
+	return iterator(_bst, tmp);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::lower_bound( const Key& key ) const
+{
+	const_iterator ret = end();
+	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	while ( tmp )
+	{
+		if ( _comp(tmp->get_value()->first, key) )
+			tmp = tmp->get_right();
+		else if ( _comp(key, tmp->get_value()->first) )
+		{
+			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
+				ret = const_iterator(_bst, tmp);
+			tmp = tmp->get_left();
+		}
+		else
+			return const_iterator(_bst, tmp);
+	}
+	return ret;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::upper_bound( const Key& key )
+{
+	iterator ret = end();
+	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	while ( tmp )
+	{
+		if ( _comp(key, tmp->get_value()->first) )
+		{
+			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
+				ret = iterator(_bst, tmp);
+			tmp = tmp->get_left();
+		}
+		else
+			tmp = tmp->get_right();
+	}
+	return ret;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::upper_bound( const Key& key ) const
+{
+	const_iterator ret = end();
+	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	while ( tmp )
+	{
+		if ( _comp(key, tmp->get_value()->first) )
+		{
+			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
+				ret = const_iterator(_bst, tmp);
+			tmp = tmp->get_left();
+		}
+		else
+			tmp = tmp->get_right();
+	}
+	return ret;
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::key_compare
+map<Key, T, Compare, Allocator>::key_comp() const
+{
+	return key_compare(_comp);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::value_compare
+map<Key, T, Compare, Allocator>::value_comp() const
+{
+	map<Key, T, Compare, Allocator>::value_compare res(key_comp());
+	return res;
+}
+
 } // namespace ft
 
 namespace ft
@@ -465,6 +585,78 @@ map<Key, T, Compare, Allocator>::compute_ras( void )
 	if (n_elem * alloc_size == target)
 		return n_elem;
 	return n_elem + 1;
+}
+
+} // namespace ft
+
+namespace ft
+{
+// non-member functions
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs,
+                 const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	typename map<Key,T,Compare,Alloc>::const_iterator l1 = lhs.begin();
+	typename map<Key,T,Compare,Alloc>::const_iterator l2 = rhs.begin();
+	typename map<Key,T,Compare,Alloc>::const_iterator last = lhs.end();
+	
+	if ( lhs.size() != rhs.size() )
+		return false;
+	while ( l1 != last )
+	{
+		if ( (l1->first != l2->first) || (l1->second != l2->second) )
+			return false;
+		++l1;
+		++l2;
+	}
+	return true;
+}
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs,
+                 const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	return !(lhs == rhs);
+}
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator<( const ft::map<Key,T,Compare,Alloc>& lhs,
+                const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	typename map<Key,T,Compare,Alloc>::const_iterator first1 = lhs.begin();
+	typename map<Key,T,Compare,Alloc>::const_iterator first2 = rhs.begin();
+	typename map<Key,T,Compare,Alloc>::const_iterator last1 = lhs.end();
+	typename map<Key,T,Compare,Alloc>::const_iterator last2 = rhs.end();
+	return ft::lexicographical_compare(first1, last1, first2, last2);
+}
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator<=( const ft::map<Key,T,Compare,Alloc>& lhs,
+                 const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	return !(rhs < lhs);
+}
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator>( const ft::map<Key,T,Compare,Alloc>& lhs,
+                const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	return (rhs < lhs);
+}
+
+template< class Key, class T, class Compare, class Alloc >
+bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs,
+                 const ft::map<Key,T,Compare,Alloc>& rhs )
+{
+	return !(lhs < rhs);
+}
+
+template< class Key, class T, class Compare, class Alloc >
+void swap( std::map<Key,T,Compare,Alloc>& lhs,
+           std::map<Key,T,Compare,Alloc>& rhs )
+{
+	lhs.swap(rhs);
 }
 
 } // namespace ft
