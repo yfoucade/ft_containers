@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/26 22:58:48 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 11:53:24 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,7 @@ map<Key, T, Compare, Allocator>::~map( void )
 {
 	destroy_tree(*_bst);
 	*_bst = NULL;
+	delete _bst;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -200,13 +201,13 @@ map<Key, T, Compare, Allocator>::operator=( const map& other )
 {
 	if (this == &other)
 		return *this;
-	~map();
+	destroy_tree(*_bst);
 	_comp = other._comp;
 	_alloc = other._alloc;
 	_size = 0;
 	_required_alloc_size = other._required_alloc_size;
-	iterator first = other.begin();
-	iterator last = other.end();
+	const_iterator first = other.begin();
+	const_iterator last = other.end();
 	while (first != last)
 		insert(*first++);
 	return *this;
@@ -242,13 +243,7 @@ const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::operator[]( const Key& key )
 {
-	std::cout << "map::operator[], key = '" << key << "'\n";
-	std::cout << "trying to insert element\n";
 	ft::pair<iterator, bool> ret = insert(ft::pair<const Key, T>(key, T()));
-	if (ret.second)
-		std::cout << "element has been inserted\n";
-	else
-		std::cout << "element was already in map\n";
 	return (*(ret.first)).second;
 }
 
@@ -257,6 +252,8 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::begin( void )
 {
+	if (*_bst)
+		return iterator(_bst, (*_bst)->minimum());
 	return iterator(_bst);
 }
 
@@ -264,15 +261,15 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::begin( void ) const
 {
-	return iterator(_bst);
+	if (*_bst)
+		return const_iterator(_bst, (*_bst)->minimum());
+	return const_iterator(_bst);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::end( void )
 {
-	if (*_bst)
-		return ++iterator(_bst, (*_bst)->maximum());
 	return iterator(_bst);
 }
 
@@ -280,9 +277,7 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::end( void ) const
 {
-	if (*_bst)
-		return ++iterator(_bst, (*_bst)->maximum());
-	return iterator(_bst);
+	return const_iterator(_bst);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -345,15 +340,9 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 ft::pair<typename map<Key, T, Compare, Allocator>::iterator, bool>
 map<Key, T, Compare, Allocator>::insert( const value_type& value )
 {
-	std::cout << "map::insert\n";
 	iterator it = find(value.first);
 	if (it != end())
-	{
-		std::cout << "element was found in map\n";
 		return ft::pair<iterator, bool>(it, false);
-	}
-	else
-		std::cout << "key was not found in map\n";
 	value_type* new_value = reinterpret_cast<value_type*>(_alloc.allocate(_required_alloc_size));
 	// _alloc.construct(new_value, value);
 	new((void *)new_value) value_type(value);
