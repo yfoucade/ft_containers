@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 22:18:18 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 19:42:11 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 20:06:04 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,22 @@ void test_constructor( void )
 			m['a'] = 0;
 			std::cout << (m < m2) << std::endl;
 		}
+	}
+	{
+		std::cout << "assignment operator\n";
+		ft::pair< const char, int > p[4] = {
+			ft::pair< const char, int >('a', 97),
+			ft::pair< const char, int >('*', 42),
+			ft::pair< const char, int >(104, 104),
+			ft::pair< const char, int >('A', 65)
+		};
+		ft::map<char, int> m(p, p+4);
+		ft::map<char, int> m2;
+		m2 = m;
+		ft::map< char, int >::iterator it = m2.begin();
+		ft::map< char, int >::iterator end = m2.end();
+		while ( it != end )
+			std::cout << it++->second << std::endl;
 	}
 	// ft::map<char, int>::iterator it(m2.begin());
 	// m2['a'] = 1;
