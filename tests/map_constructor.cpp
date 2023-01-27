@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 22:18:18 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 11:53:53 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 19:42:11 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,23 @@ void test_constructor( void )
 	{
 		std::cout << "copy constructor\n";
 		{
+			std::pair< const char, int > p[4] = {
+				std::pair< const char, int >('a', 97),
+				std::pair< const char, int >('*', 42),
+				std::pair< const char, int >(104, 104),
+				std::pair< const char, int >('A', 65)
+			};
+			std::map<char, int> m(p, p+4);
+			std::map<char, int> m2(m);
+			std::map< char, int >::iterator it = m2.begin();
+			std::map< char, int >::iterator end = m2.end();
+			while ( it != end )
+				std::cout << it++->second << std::endl;
+			std::cout << (m == m2) << std::endl;
+			m['a'] = 0;
+			std::cout << (m < m2) << std::endl;
+		}
+		{
 			ft::pair< const char, int > p[4] = {
 				ft::pair< const char, int >('a', 97),
 				ft::pair< const char, int >('*', 42),
@@ -108,6 +125,9 @@ void test_constructor( void )
 			ft::map< char, int >::iterator end = m2.end();
 			while ( it != end )
 				std::cout << it++->second << std::endl;
+			std::cout << (m == m2) << std::endl;
+			m['a'] = 0;
+			std::cout << (m < m2) << std::endl;
 		}
 	}
 	// ft::map<char, int>::iterator it(m2.begin());
