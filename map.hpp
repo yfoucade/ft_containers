@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 18:32:36 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/27 19:51:36 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,9 +127,6 @@ template<
 		// observers
 		key_compare key_comp() const;
 		value_compare value_comp() const;
-		template < class Ke, class Ty, class Co, class Al>
-		friend bool operator<( const map<Ke, Ty, Co, Al>& lhs,
-							   const map<Ke, Ty, Co, Al>& rhs );
 };
 
 } // namespace ft
