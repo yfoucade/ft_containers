@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/07 15:01:21 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 10:59:54 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 05:05:54 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <iostream>
 #include <vector>
 #include "vector.hpp"
+#include "map.hpp"
 #include "pair.hpp"
 
 template< typename Container >
@@ -27,7 +28,9 @@ void	test_capacity( void );
 void	test_modifiers( void );
 void	test_non_member( void );
 
+// map
 void test_constructor( void );
+void test_map_access( void );
 
 template< typename Container >
 void print_content( Container c, char sep )

@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/25 22:28:26 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 05:14:31 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,5 @@ int main( void )
 	test_insert();
 	test_iterators();
 	test_constructor();
+	test_map_access();
 }

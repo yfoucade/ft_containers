@@ -27,6 +27,7 @@ TEST_MAP = tests/test_map
 TEST_MAP_OBJ = \
 	tests/test_map.o \
 	tests/map_constructor.o \
+	tests/map_access.o \
 
 .PHONY = all clean fclean re
 
