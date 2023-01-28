@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/25 22:18:18 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 20:06:04 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 10:47:12 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,4 +150,25 @@ void test_constructor( void )
 	// m2['a'] = 1;
 	// --it;
 	// std::cout << ((*it).second) << std::endl;
+	{
+		std::cout << "test destructor (nested maps)\n";
+		ft::map< ft::map<char, int>, ft::map<char, int> > m;
+		ft::map< char, int > empty;
+		ft::map< char, int > m1;
+		ft::map< char, int > m2;
+
+		ft::pair<const char, int> p1('*', 42);
+		ft::pair<const char, int> p2('a', 97);
+		ft::pair<const char, int> p3('0', 47);
+
+		m1.insert(p1);
+		m2.insert(p2); m2.insert(p3);
+		
+		ft::pair< const ft::map<char, int>, ft::map<char, int> > mp1(empty, empty);
+		ft::pair< const ft::map<char, int>, ft::map<char, int> > mp2(empty, m1);
+		ft::pair< const ft::map<char, int>, ft::map<char, int> > mp3(m1, m2);
+		ft::pair< const ft::map<char, int>, ft::map<char, int> > mp4(m2, m1);
+
+		m.insert(mp1); m.insert(mp2); m.insert(mp3); m.insert(mp4);
+	}
 }
