@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 06:01:39 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 06:07:57 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,6 +229,8 @@ map<Key, T, Compare, Allocator>::get_allocator( void ) const
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::at( const Key& key )
 {
+	if (!*_bst)
+		throw std::out_of_range("map::at");
 	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->search(key);
 	if (!res)
 		throw std::out_of_range("map::at");
@@ -238,6 +240,8 @@ T& map<Key, T, Compare, Allocator>::at( const Key& key )
 template< typename Key, typename T, typename Compare, typename Allocator >
 const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 {
+	if (!*_bst)
+		throw std::out_of_range("map::at");
 	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->search(key);
 	if (!res)
 		throw std::out_of_range("map::at");
