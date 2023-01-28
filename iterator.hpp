@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 11:45:10 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/19 17:15:00 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 21:54:08 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ namespace ft
 	typename reverse_iterator<Iter>::pointer reverse_iterator<Iter>::operator->( void ) const
 	{
 		iterator_type tmp = current;
-		return --tmp;
+		return (--tmp).operator->();
 	}
 
 	template< typename Iter >
