@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/27 21:33:23 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 05:21:38 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,19 +229,19 @@ map<Key, T, Compare, Allocator>::get_allocator( void ) const
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::at( const Key& key )
 {
-	BinarySearchTree<Key, value_type, Compare>* res = (*_bst).find(key);
+	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->search(key);
 	if (!res)
-		throw std::out_of_range("Key <key> not found in map\n");
-	return res->get_value().second;
+		throw std::out_of_range("map::at");
+	return res->get_value()->second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 {
-	BinarySearchTree<Key, value_type, Compare>* res = *_bst.find(key);
+	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->find(key);
 	if (!res)
-		throw std::out_of_range("Key <key> not found in map\n");
-	return res->get_value().second;
+		throw std::out_of_range("map::at");
+	return res->get_value()->second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -651,8 +651,8 @@ bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs,
 }
 
 template< class Key, class T, class Compare, class Alloc >
-void swap( std::map<Key,T,Compare,Alloc>& lhs,
-           std::map<Key,T,Compare,Alloc>& rhs )
+void swap( ft::map<Key,T,Compare,Alloc>& lhs,
+           ft::map<Key,T,Compare,Alloc>& rhs )
 {
 	lhs.swap(rhs);
 }
