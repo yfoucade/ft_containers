@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 10:04:16 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 21:52:37 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ template<
 	typename T
 > class BSTIterator{
 	public:
-		typedef void difference_type;
+		typedef long int difference_type;
 		typedef T value_type;
 		typedef T* pointer;
 		typedef T& reference;
