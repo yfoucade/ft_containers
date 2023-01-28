@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 05:14:31 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 05:39:19 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <map>
 #include "tests.hpp"
 
-void test_iterators( void )
+void test_map_iterators( void )
 {
 	std::cout << "test_iterators\n";
 	// are all past-the-end iterators equal ?
@@ -75,7 +75,7 @@ int main( void )
 	}
 	// data is not contiguous in memory, it is not sorted in memory neither.
 	test_insert();
-	test_iterators();
 	test_constructor();
 	test_map_access();
+	test_map_iterators();
 }

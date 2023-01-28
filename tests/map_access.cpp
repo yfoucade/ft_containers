@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 05:04:54 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 05:33:04 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/28 06:02:45 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,25 @@ void test_map_access( void )
 		m['a'] = 97;
 
 		int& p = m.at('a');
+		const std::map<char, int> m2(m);
+		const int& q = m2.at('a');
 		p = 98;
-		std::cout << m['a'] << std::endl;
+		std::cout << m['a'] << " " << q << std::endl;
 
 		try
 		{
 			int& q = m.at('b');
 			q = 42;
-			std::cout << m['q'] << std::endl;
+			std::cout << m['b'] << std::endl;
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
+		try
+		{
+			const int& q = m2.at('b');
+			std::cout << q << std::endl;
 		}
 		catch (std::exception& e)
 		{
@@ -44,8 +55,10 @@ void test_map_access( void )
 		m['a'] = 97;
 
 		int& p = m.at('a');
+		const ft::map<char, int> m2(m);
+		const int& q = m2.at('a');
 		p = 98;
-		std::cout << m['a'] << std::endl;
+		std::cout << m['a'] << " " << q << std::endl;
 
 		try
 		{
@@ -57,9 +70,18 @@ void test_map_access( void )
 		{
 			std::cout << e.what() << std::endl;
 		}
+		try
+		{
+			const int& q = m2.at('b');
+			std::cout << q << std::endl;
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
 	}
 	{
-		std::cout << "map operator[]\n";
+		std::cout << "test map operator[]\n";
 		std::map<char, int> m;
 		m['a'] = 97;
 
@@ -80,7 +102,7 @@ void test_map_access( void )
 		}
 	}
 	{
-		std::cout << "map operator[]\n";
+		std::cout << "test map operator[]\n";
 		ft::map<char, int> m;
 		m['a'] = 97;
 
