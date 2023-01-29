@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 21:53:01 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/29 21:25:56 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,52 @@ void test_insert( void )
 	std::cout << (m['a']) << std::endl;
 }
 
+void test_map_capacity( void )
+{
+	std::cout << "=========================\n";
+	std::cout << "=== test_map_capacity ===\n";
+	std::cout << "=========================\n";
+	{
+		std::cout << "test empty\n";
+		ft::map<char, int> m1;
+		ft::map<char, int> m2;
+		m2.insert(ft::pair<char, int>('a', 97));
+
+		std::cout << m1.empty() << std::endl;
+		std::cout << m2.empty() << std::endl;
+		m2.erase('a');
+		std::cout << m2.empty() << std::endl;
+		std::cout << std::endl;
+	}
+	{
+		std::cout << "test empty\n";
+		ft::map<char, int> m1;
+		ft::map<char, int> m2;
+		m2.insert(ft::pair<char, int>('a', 97));
+		m2.insert(ft::pair<char, int>('b', 98));
+		m2.insert(ft::pair<char, int>('c', 99));
+
+		std::cout << m1.size() << std::endl;
+
+		ft::map<char, int>::iterator it = m2.begin();
+		ft::map<char, int>::iterator end = m2.end();
+		while (it != end)
+			std::cout << it++->second << " ";
+		std::cout << "\n";
+		
+		std::cout << m2.size() << std::endl;
+		m2.erase('a');
+
+		for (it = m2.begin(); it != end; ++it)
+			std::cout << it++->second << " ";
+
+		std::cout << m2.size() << std::endl;
+		m2.clear();
+		std::cout << m2.size() << std::endl;
+		std::cout << std::endl;
+	}
+}
+
 int main( void )
 {
 	std::map< char, int > m;
@@ -156,8 +202,10 @@ int main( void )
 		break;
 	}
 	// data is not contiguous in memory, it is not sorted in memory neither.
+
 	test_insert();
 	test_constructor();
 	test_map_access();
 	test_map_iterators();
+	test_map_capacity();
 }
