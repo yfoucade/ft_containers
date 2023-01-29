@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 06:07:57 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/29 17:57:11 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -382,7 +382,10 @@ void map<Key, T, Compare, Allocator>::insert( InputIt first, InputIt last )
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::erase( iterator pos )
 {
-	pos->remove();
+	if (!pos->get_parent())
+		*_bst = pos->remove();
+	else
+		pos->remove();
 	--_size;
 }
 
@@ -391,7 +394,7 @@ void map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
 {
 	while (first != last)
 	{
-		first++->remove();
+		erase(first++);
 		--_size;
 	}
 }
@@ -400,10 +403,15 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::erase( const Key& key )
 {
-	BinarySearchTree<Key, value_type, Compare>* node = (*_bst).find(key);
+	BinarySearchTree<Key, value_type, Compare>* node = (*_bst)->search(key);
 	if (node)
 	{
-		node->remove();
+		if (!node->get_parent())
+		{
+			*_bst = node->remove();
+		}
+		else
+			node->remove();
 		--_size;
 		return 1;
 	}

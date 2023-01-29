@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/29 17:52:48 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/29 21:23:30 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,11 +103,6 @@ BinarySearchTree< Key, T, Compare >& BinarySearchTree< Key, T, Compare >::operat
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >::~BinarySearchTree( void )
 {
-	if (_left)
-		_left->~BinarySearchTree();
-	if (_right)
-		_right->~BinarySearchTree();
-	remove();
 }
 
 template< typename Key, typename T, typename Compare >
@@ -446,11 +441,6 @@ BinarySearchTree< Key, void, Compare >& BinarySearchTree< Key, void, Compare >::
 template< typename Key, typename Compare >
 BinarySearchTree< Key, void, Compare >::~BinarySearchTree( void )
 {
-	if (_left)
-		_left->~BinarySearchTree();
-	if (_right)
-		_right->~BinarySearchTree();
-	remove();
 }
 
 template< typename Key, typename Compare >
