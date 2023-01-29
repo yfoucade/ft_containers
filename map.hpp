@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/29 17:57:11 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/29 21:24:15 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -412,6 +412,9 @@ map<Key, T, Compare, Allocator>::erase( const Key& key )
 		}
 		else
 			node->remove();
+		node->get_value()->~value_type();
+		_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(node->get_value()), _required_alloc_size);
+		delete node;
 		--_size;
 		return 1;
 	}
