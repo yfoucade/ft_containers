@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/13 09:58:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/26 19:01:11 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/29 17:52:48 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,33 +294,35 @@ BinarySearchTree< Key, T, Compare >::transplant( BinarySearchTree* other )
 	if (other)
 		other->_parent = _parent;
 	_parent = NULL;
-	return this;
+	return other;
 }
 
 template< typename Key, typename T, typename Compare >
 BinarySearchTree< Key, T, Compare >*
 BinarySearchTree< Key, T, Compare >::remove( void )
 {
-	BinarySearchTree* successor;
+	/*
+		Return a pointer to the node that replaces the current node.
+	*/
+	BinarySearchTree* tmp_successor;
 
 	if (!_left)
-		transplant(_right);
+		return transplant(_right);
 	else if (!_right)
-		transplant(_left);
+		return transplant(_left);
 	else
 	{
-		successor = minimum();
-		if (successor->_parent != this)
+		tmp_successor = successor();
+		if (tmp_successor->_parent != this)
 		{
-			successor->transplant(successor->_right);
-			successor->_right = _right;
-			successor->_right->_parent = successor;
+			tmp_successor->transplant(tmp_successor->_right);
+			tmp_successor->_right = _right;
+			tmp_successor->_right->_parent = tmp_successor;
 		}
-		transplant(successor);
-		successor->_left = _left;
-		successor->_left->_parent = successor;
+		tmp_successor->_left = _left;
+		tmp_successor->_left->_parent = tmp_successor;
+		return transplant(tmp_successor);
 	}
-	return this;
 }
 
 template< typename Key, typename T, typename Compare >
@@ -636,33 +638,35 @@ BinarySearchTree< Key, void, Compare >::transplant( BinarySearchTree* other )
 	if (other)
 		other->_parent = _parent;
 	_parent = NULL;
-	return this;
+	return other;
 }
 
 template< typename Key, typename Compare >
 BinarySearchTree< Key, void, Compare >*
 BinarySearchTree< Key, void, Compare >::remove( void )
 {
-	BinarySearchTree* successor;
+	/*
+		Return a pointer to the node that replaces the current node.
+	*/
+	BinarySearchTree* tmp_successor;
 
 	if (!_left)
-		transplant(_right);
+		return transplant(_right);
 	else if (!_right)
-		transplant(_left);
+		return transplant(_left);
 	else
 	{
-		successor = minimum();
-		if (successor->_parent != this)
+		tmp_successor = successor();
+		if (tmp_successor->_parent != this)
 		{
-			successor->transplant(successor->_right);
-			successor->_right = _right;
-			successor->_right->_parent = successor;
+			tmp_successor->transplant(tmp_successor->_right);
+			tmp_successor->_right = _right;
+			tmp_successor->_right->_parent = tmp_successor;
 		}
-		transplant(successor);
-		successor->_left = _left;
-		successor->_left->_parent = successor;
+		tmp_successor->_left = _left;
+		tmp_successor->_left->_parent = tmp_successor;
+		return transplant(tmp_successor);
 	}
-	return this;
 }
 
 template< typename Key, typename Compare >
@@ -699,6 +703,17 @@ typename BinarySearchTree<Key, void, Compare>::member_of_pointer_type
 BinarySearchTree<Key, void, Compare>::member_of_pointer( void )
 {
 	return &_key;
+}
+
+} // namespace ft
+
+namespace ft
+{
+
+template< typename Key, typename T, typename Compare >
+bool operator==( BinarySearchTree<Key, T, Compare>& lhs, BinarySearchTree<Key, T, Compare>& rhs)
+{
+	return lhs.get_value() == rhs.get_value();
 }
 
 } // namespace ft
