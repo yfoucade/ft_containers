@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 10:39:43 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 10:50:46 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,11 +192,7 @@ map<Key, T, Compare, Allocator>::destroy_tree( BinarySearchTree<Key, value_type,
 	{
 		destroy_tree(bst->get_left());
 		destroy_tree(bst->get_right());
-		bst->get_value()->~value_type();
-		// _alloc.deallocate(bst->get_value(), _required_alloc_size);
-		_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(bst->get_value()), _required_alloc_size);
-		delete bst;
-		--_size;
+		erase_node(bst);
 	}
 }
 
