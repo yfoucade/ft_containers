@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 10:39:52 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 11:33:36 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,6 +187,38 @@ void test_map_capacity( void )
 	}
 }
 
+void test_map_modifiers( void )
+{
+	std::cout << "==========================\n";
+	std::cout << "=== test_map_modifiers ===\n";
+	std::cout << "==========================\n";
+	{
+		std::cout << "test clear()\n";
+		// after clear, any past-the-end iterator remains valid
+		ft::map<char, int> m1;
+		m1.insert(ft::pair<char, int>('a', 97));
+		m1.insert(ft::pair<char, int>('b', 98));
+		ft::map<char, int>::iterator it = m1.begin();
+		ft::map<char, int>::iterator end = m1.end();
+		ft::map<char, int>::reverse_iterator rit = m1.rbegin();
+		ft::map<char, int>::reverse_iterator rend = m1.rend();
+
+		std::cout << m1.size() << std::endl;
+		m1.clear();
+		std::cout << m1.size() << std::endl;
+		m1.insert(ft::pair<char, int>('c', 99));
+		// check that past-the-end iterator is not invalidated
+		for(it = m1.begin(); it != end; ++it)
+			std::cout << it->second << " ";
+		std::cout << "\n";
+		// check for past-the-end reverse iterator
+		for(rit = m1.rbegin(); rit != rend; ++rit)
+			std::cout << rit->second << " ";
+		std::cout << "\n";
+		std::cout << (rend == m1.rend()) << std::endl;
+	}
+}
+
 int main( void )
 {
 	std::map< char, int > m;
@@ -216,4 +248,5 @@ int main( void )
 	test_map_access();
 	test_map_iterators();
 	test_map_capacity();
+	test_map_modifiers();
 }
