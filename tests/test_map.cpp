@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/29 21:25:56 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 10:39:52 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void test_map_capacity( void )
 		std::cout << std::endl;
 	}
 	{
-		std::cout << "test empty\n";
+		std::cout << "test size\n";
 		ft::map<char, int> m1;
 		ft::map<char, int> m2;
 		m2.insert(ft::pair<char, int>('a', 97));
@@ -176,6 +176,14 @@ void test_map_capacity( void )
 		m2.clear();
 		std::cout << m2.size() << std::endl;
 		std::cout << std::endl;
+	}
+	{
+		std::cout << "test max_size\n";
+		std::map<char, int> m1;
+		ft::map<char, int> m2;
+		std::cout << m1.max_size() << std::endl;
+		std::cout << m2.max_size() << std::endl;
+		std::cout << (m1.max_size() == m2.max_size() ? "Ok" : "Ko") << std::endl;
 	}
 }
 
