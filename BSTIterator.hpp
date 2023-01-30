@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/28 21:52:37 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 10:05:46 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ template<
 		BSTIterator operator++( int );
 		BSTIterator& operator--( void );
 		BSTIterator operator--( int );
+		BST* get_node( void );
 };
 
 template< typename BST, typename T >
@@ -159,6 +160,12 @@ bool
 operator!=( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
 {
 	return !( lhs == rhs );
+}
+
+template< typename BST, typename T >
+BST* BSTIterator< BST, T >::get_node( void )
+{
+	return _curr;
 }
 
 } // namespace ft
