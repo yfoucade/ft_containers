@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/29 21:24:15 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 10:39:43 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ template<
 		size_type _required_alloc_size;
 		void destroy_tree(BinarySearchTree<Key, value_type, Compare>* bst);
 		size_type compute_ras( void );
+		size_type erase_node( BinarySearchTree<Key, value_type, Compare>* );
 
 	// member classes
 	public:
@@ -333,7 +334,7 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::max_size() const
 {
-	return std::numeric_limits<difference_type>::max() / sizeof(value_type);
+	return std::numeric_limits<difference_type>::max() / sizeof(BinarySearchTree<Key, value_type, Compare>);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -382,11 +383,12 @@ void map<Key, T, Compare, Allocator>::insert( InputIt first, InputIt last )
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::erase( iterator pos )
 {
-	if (!pos->get_parent())
-		*_bst = pos->remove();
-	else
-		pos->remove();
-	--_size;
+	erase_node(pos->get_node());
+	// if (!pos->get_parent())
+	// 	*_bst = pos->remove();
+	// else
+	// 	pos->remove();
+	// --_size;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -394,8 +396,8 @@ void map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
 {
 	while (first != last)
 	{
-		erase(first++);
-		--_size;
+		erase_node(first++->get_node());
+		// --_size;
 	}
 }
 
@@ -404,21 +406,25 @@ typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::erase( const Key& key )
 {
 	BinarySearchTree<Key, value_type, Compare>* node = (*_bst)->search(key);
-	if (node)
-	{
-		if (!node->get_parent())
-		{
-			*_bst = node->remove();
-		}
-		else
-			node->remove();
-		node->get_value()->~value_type();
-		_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(node->get_value()), _required_alloc_size);
-		delete node;
-		--_size;
-		return 1;
-	}
-	return 0;
+	return erase_node(node);
+}
+
+template< typename Key, typename T, typename Compare, typename Allocator >
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::erase_node(
+	BinarySearchTree<Key, value_type, Compare>* node )
+{
+	if (!node)
+		return 0;
+	if (!node->get_parent())
+		*_bst = node->remove();
+	else
+		node->remove();
+	node->get_value()->~value_type();
+	_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(node->get_value()), _required_alloc_size);
+	delete node;
+	--_size;
+	return 1;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
