@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 10:05:46 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 13:19:58 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,10 +126,16 @@ template< typename BST, typename T >
 BSTIterator< BST, T >&
 BSTIterator< BST, T >::operator--( void )
 {
+	BST* tmp;
+
 	if (!_curr)
 		_curr = (*_root)->maximum();
 	else
-		_curr = _curr->predecessor();
+	{
+		tmp = _curr->predecessor();
+		if (tmp)
+			_curr = tmp;
+	}
 	return *this;
 }
 
