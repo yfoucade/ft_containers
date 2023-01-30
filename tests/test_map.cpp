@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 11:33:36 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 13:21:32 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,32 @@ void test_map_modifiers( void )
 	{
 		std::cout << "test clear()\n";
 		// after clear, any past-the-end iterator remains valid
+		std::map<char, int> m1;
+		m1.insert(std::pair<char, int>('a', 97));
+		m1.insert(std::pair<char, int>('b', 98));
+		std::map<char, int>::iterator it = m1.begin();
+		std::map<char, int>::iterator end = m1.end();
+		std::map<char, int>::reverse_iterator rit = m1.rbegin();
+		std::map<char, int>::reverse_iterator rend = m1.rend();
+
+		std::cout << m1.size() << std::endl;
+		m1.clear();
+		std::cout << m1.size() << std::endl;
+		m1.insert(std::pair<char, int>('c', 99));
+		// check that past-the-end iterator is not invalidated
+		for(it = m1.begin(); it != end; ++it)
+			std::cout << it->second << " ";
+		std::cout << "\n";
+		// check for past-the-end reverse iterator
+		// for(rit = m1.rbegin(); rit != rend; ++rit)
+		for(rit = m1.rbegin(), rend=m1.rend(); rit != rend; ++rit)
+			std::cout << rit->second << " ";
+		std::cout << "\n";
+		std::cout << (rend == m1.rend()) << std::endl;
+	}
+	{
+		std::cout << "test clear()\n";
+		// after clear, any past-the-end iterator remains valid
 		ft::map<char, int> m1;
 		m1.insert(ft::pair<char, int>('a', 97));
 		m1.insert(ft::pair<char, int>('b', 98));
@@ -212,7 +238,8 @@ void test_map_modifiers( void )
 			std::cout << it->second << " ";
 		std::cout << "\n";
 		// check for past-the-end reverse iterator
-		for(rit = m1.rbegin(); rit != rend; ++rit)
+		// for(rit = m1.rbegin(); rit != rend; ++rit)
+		for(rit = m1.rbegin(), rend=m1.rend(); rit != rend; ++rit)
 			std::cout << rit->second << " ";
 		std::cout << "\n";
 		std::cout << (rend == m1.rend()) << std::endl;
