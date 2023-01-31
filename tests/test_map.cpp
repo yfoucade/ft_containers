@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/11 14:41:09 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 13:23:09 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/01/30 14:44:07 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void test_map_iterators( void )
 	std::cout << "=== test_map_iterators ===\n";
 	std::cout << "==========================\n";
 	{
+		std::cout << "test iterators\n";
 		ft::map<char, int> m0;
 		ft::map<char, int> m1;
 		ft::pair<char, int> a('a', 97);
@@ -40,6 +41,7 @@ void test_map_iterators( void )
 		std::cout << std::endl;
 	}
 	{
+		std::cout << "test const_iterators\n";
 		ft::pair<char, int> pair_list[3] = {
 			ft::pair<char, int>('a', 97),
 			ft::pair<char, int>('*', 42),
@@ -80,6 +82,7 @@ void test_map_iterators( void )
 	// 	std::cout << std::endl;
 	// }
 	{
+		std::cout << "test reverse_iterators\n";
 		ft::map<char, int> m0;
 		ft::map<char, int> m1;
 		ft::pair<char, int> a('a', 97);
@@ -100,6 +103,7 @@ void test_map_iterators( void )
 		std::cout << std::endl;
 	}
 	{
+		std::cout << "test const_reverse_iterators\n";
 		ft::pair<char, int> pair_list[3] = {
 			ft::pair<char, int>('a', 97),
 			ft::pair<char, int>('*', 42),
@@ -193,7 +197,7 @@ void test_map_modifiers( void )
 	std::cout << "=== test_map_modifiers ===\n";
 	std::cout << "==========================\n";
 	{
-		std::cout << "test clear()\n";
+		std::cout << "test clear() [std]\n";
 		// after clear, any past-the-end iterator remains valid
 		std::map<char, int> m1;
 		m1.insert(std::pair<char, int>('a', 97));
@@ -219,7 +223,7 @@ void test_map_modifiers( void )
 		std::cout << (rend == m1.rend()) << std::endl;
 	}
 	{
-		std::cout << "test clear()\n";
+		std::cout << "test clear() [ft]\n";
 		// after clear, any past-the-end iterator remains valid
 		ft::map<char, int> m1;
 		m1.insert(ft::pair<char, int>('a', 97));
@@ -243,6 +247,29 @@ void test_map_modifiers( void )
 			std::cout << rit->second << " ";
 		std::cout << "\n";
 		std::cout << (rend == m1.rend()) << std::endl;
+	}
+	{
+		std::cout << "test insert(value) [ft]\n";
+		ft::map<char, int> m1;
+
+		m1.insert(ft::pair<char, int>('a', 98));
+		for(ft::map<char, int>::iterator it=m1.begin(); it != m1.end(); ++it)
+			std::cout << it->second << " ";
+		std::cout << "\n";
+		std::cout << m1.size() << "\n";
+		m1.insert(ft::pair<char, int>('a', 98));
+		for(ft::map<char, int>::iterator it=m1.begin(); it != m1.end(); ++it)
+			std::cout << it->second << " ";
+		std::cout << "\n";
+		std::cout << m1.size() << "\n";
+		m1.insert(ft::pair<char, int>('b', 99));
+		for(ft::map<char, int>::iterator it=m1.begin(); it != m1.end(); ++it)
+			std::cout << it->second << " ";
+		std::cout << "\n";
+		std::cout << m1.size() << "\n";
+	}
+	{
+		
 	}
 }
 
