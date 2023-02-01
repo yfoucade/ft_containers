@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 13:19:58 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 17:35:39 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,10 @@ template<
 		BSTIterator& operator=( const BSTIterator& other );
 		void operator=( BST* new_curr );
 		~BSTIterator( void );
-		template< typename A, typename B >
-		friend bool operator==( const BSTIterator< A, B >&, const BSTIterator< A, B >& );
-		template< typename A, typename B >
-		friend bool operator!=( const BSTIterator< A, B >&, const BSTIterator< A, B >& );
+		template< typename Tree, typename A, typename B >
+		friend bool operator==( const BSTIterator< Tree, A >&, const BSTIterator< Tree, B >& );
+		template< typename Tree, typename A, typename B >
+		friend bool operator!=( const BSTIterator< Tree, A >&, const BSTIterator< Tree, B >& );
 		// reference operator*( void );
 		indirection_type operator*( void );
 		member_of_pointer_type operator->( void );
@@ -55,7 +55,14 @@ template<
 		BSTIterator& operator--( void );
 		BSTIterator operator--( int );
 		BST* get_node( void );
+		operator typename BST::const_iterator() const;
 };
+
+template< typename BST, typename T >
+BSTIterator< BST, T >::operator typename BST::const_iterator() const
+{
+	return typename BST::const_iterator(_root, _curr);
+}
 
 template< typename BST, typename T >
 BSTIterator< BST, T >::BSTIterator( void ):
@@ -154,16 +161,16 @@ BSTIterator< BST, T >::operator--( int )
 namespace ft
 {
 
-template< typename BST, typename T >
+template< typename BST, typename T, typename U >
 bool
-operator==( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
+operator==( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, U >& rhs )
 {
 	return ((lhs._curr == rhs._curr ) && (lhs._root == rhs._root));
 }
 
-template< typename BST, typename T >
+template< typename BST, typename T, typename U >
 bool
-operator!=( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, T >& rhs )
+operator!=( const BSTIterator< BST, T >& lhs, const BSTIterator< BST, U >& rhs )
 {
 	return !( lhs == rhs );
 }
