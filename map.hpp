@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 23:03:33 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 23:45:53 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,6 +364,7 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::insert( iterator pos, const value_type& value )
 {
+	static_cast<void>(pos);
 	return insert(value).first;
 }
 
@@ -426,19 +427,19 @@ map<Key, T, Compare, Allocator>::erase_node(
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::swap( map& other )
 {
-	BinarySearchTree<Key, value_type, Compare>* tmp_bst = *_bst;
+	BinarySearchTree<Key, value_type, Compare>** tmp_bst = _bst;
 	key_compare tmp_comp = _comp;
 	allocator_type tmp_alloc = _alloc;
 	size_type tmp_size = _size;
 	size_type tmp_required_alloc_size = _required_alloc_size;
 	
-	*_bst = *(other._bst);
+	_bst = other._bst;
 	_comp = other._comp;
 	_alloc = other._alloc;
 	_size = other._size;
 	_required_alloc_size = other._required_alloc_size;
 
-	*(other._bst) = tmp_bst;
+	other._bst = tmp_bst;
 	other._comp = tmp_comp;
 	other._alloc = tmp_alloc;
 	other._size = tmp_size;
@@ -503,7 +504,7 @@ map<Key, T, Compare, Allocator>::lower_bound( const Key& key )
 		else
 			return iterator(_bst, tmp);
 	}
-	return iterator(_bst, tmp);
+	return ret;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
