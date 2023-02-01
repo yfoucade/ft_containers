@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 00:02:54 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 01:22:55 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -446,7 +446,7 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::insert(
 template< typename T, typename Allocator >
 typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator pos )
 {
-	pos->~T();
+	pos->T::~T();
 	iterator it = pos;
 	iterator ret = it;
 	iterator last = end();
@@ -454,7 +454,7 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator po
 	while (++it != last)
 	{
 		new(pos++) value_type(*it);
-		it->~T();
+		it->T::~T();
 	}
 	return ret;
 }
@@ -469,14 +469,14 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 	iterator finish = end();
 	while (it != last)
 	{
-		it++->~T();
+		it++->T::~T();
 		--_size;
 	}
 	it = first;
 	while (last != finish)
 	{
 		new(it++) value_type(*last);
-		last++->~T();
+		last++->T::~T();
 	}
 	return ret;
 }
@@ -493,7 +493,7 @@ void vector<T, Allocator>::pop_back()
 {
 	if (!_size)
 		return ;
-	_tab[_size - 1].~T();
+	_tab[_size - 1].T::~T();
 	--_size;
 }
 
@@ -509,7 +509,7 @@ void vector<T, Allocator>::resize( size_type count, T value )
 	else
 	{
 		for (size_type i = count; i < _size; ++i)
-			_tab[i].~T();
+			_tab[i].T::~T();
 	}
 	_size = count;
 }
@@ -572,7 +572,7 @@ void vector<T, Allocator>::destroy_tab_elements( void )
 	iterator	last = end();
 
 	for ( ; first != last; ++first )
-		first->~T();
+		first->T::~T();
 	std::memset(
 		reinterpret_cast<void*>(_tab),
 		0,
