@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 01:22:55 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 10:31:48 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,11 +216,16 @@ template< typename T, typename Allocator >
 template< class InputIt >
 void vector<T, Allocator>::assign_specialization( InputIt first, InputIt last, ft::false_type )
 {
+	T* tmp = allocate_capacity(last - first);
+	for (InputIt it = first; it != last; ++it)
+		tmp[it - first] = *it;
 	destroy_tab_elements();
-	reserve(last - first);
+	_allocator.deallocate(
+		reinterpret_cast<typename Allocator::pointer>(_tab),
+		get_alloc_size(_capacity));
+	_tab = tmp;
+	_capacity = last - first;
 	_size = last - first;
-	for (InputIt tmp = first; tmp != last; ++tmp)
-		_tab[tmp - first] = *tmp;
 }
 
 template< typename T, typename Allocator >
@@ -379,10 +384,12 @@ template< typename T, typename Allocator >
 void vector<T, Allocator>::reserve( size_type new_cap )
 {
 	if (new_cap > max_size())
-		throw (std::length_error("Cannot allocate more than max_size()"));
+		throw (std::length_error("vector::reserve"));
 	if (new_cap <= _capacity)
 		return;
-	new_cap = (new_cap >= (max_size() >> 1) ? max_size() : 2 * new_cap);
+	// new_cap = (new_cap >= (max_size() >> 1) ? max_size() : 2 * new_cap);
+	if ( (_capacity << 1) > new_cap)
+		new_cap = 2 * _capacity;
 	T* tmp = (allocate_capacity(new_cap));
 	iterator first = begin();
 	iterator last = end();
