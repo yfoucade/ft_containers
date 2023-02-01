@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 10:31:48 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 15:34:16 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class vector{
 		void assign_specialization( size_type count, const T& value, ft::true_type );
 		template< class InputIt >
 		void assign_specialization( InputIt first, InputIt last, ft::false_type );
+		void len_check( size_type n );
 
 	public:
 		// constructor, destructor, operator=, assign, get_allocator
@@ -162,7 +163,7 @@ template< typename T, typename Allocator >
 vector<T, Allocator>::vector( const vector& other ):
 _allocator(other._allocator),
 _size(other._size),
-_capacity(other._capacity),
+_capacity(other._size),
 _tab(NULL)
 {
 	_tab = allocate_capacity(_capacity);
@@ -178,11 +179,20 @@ vector<T, Allocator>& vector<T, Allocator>::operator=( const vector& other )
 {
 	if ( this == &other )
 		return *this;
-	this->~vector();
-	_allocator = other._allocator;
-	_size = other._size;
-	_capacity = other._capacity;
-	_tab = allocate_capacity(_capacity);
+	if (_capacity < other._size)
+	{
+		this->~vector();
+		_allocator = other._allocator;
+		_size = other._size;
+		_capacity = other._capacity;
+		_tab = allocate_capacity(_capacity);
+	}
+	else
+	{
+		destroy_tab_elements();
+		_allocator = other._allocator;
+		_size = other._size;
+	}
 	const_iterator first = other.begin();
 	const_iterator it;
 	const_iterator last = other.end();
@@ -206,7 +216,7 @@ template< typename T, typename Allocator >
 void vector<T, Allocator>::assign_specialization( size_type count, const T& value, ft::true_type )
 {
 	destroy_tab_elements();
-	reserve(count);
+	len_check(count);
 	_size = count;
 	for (size_type i = 0; i < count; ++i)
 		_tab[i] = value;
@@ -216,23 +226,35 @@ template< typename T, typename Allocator >
 template< class InputIt >
 void vector<T, Allocator>::assign_specialization( InputIt first, InputIt last, ft::false_type )
 {
-	T* tmp = allocate_capacity(last - first);
-	for (InputIt it = first; it != last; ++it)
-		tmp[it - first] = *it;
-	destroy_tab_elements();
-	_allocator.deallocate(
-		reinterpret_cast<typename Allocator::pointer>(_tab),
-		get_alloc_size(_capacity));
-	_tab = tmp;
-	_capacity = last - first;
-	_size = last - first;
+	if (_capacity < static_cast<size_type>(last - first))
+	{
+		T* tmp = allocate_capacity(last - first);
+		for (InputIt it = first; it != last; ++it)
+			tmp[it - first] = *it;
+		destroy_tab_elements();
+		_allocator.deallocate(
+			reinterpret_cast<typename Allocator::pointer>(_tab),
+			get_alloc_size(_capacity));
+		_tab = tmp;
+		_capacity = last - first;
+		_size = last - first;
+	}
+	else
+	{
+		InputIt it = first;
+		for ( ; it != last; ++it)
+			_tab[it - first] = *it;
+		for ( ; static_cast<size_type>(it - first) < _size; ++it)
+			_tab[it - first].T::~T();
+		_size = last - first;
+	}
 }
 
 template< typename T, typename Allocator >
 void vector<T, Allocator>::assign( size_type count, const T& value )
 {
 	destroy_tab_elements();
-	reserve(count);
+	len_check(count);
 	_size = count;
 	for (size_type i = 0; i < count; ++i)
 		_tab[i] = value;
@@ -388,8 +410,8 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 	if (new_cap <= _capacity)
 		return;
 	// new_cap = (new_cap >= (max_size() >> 1) ? max_size() : 2 * new_cap);
-	if ( (_capacity << 1) > new_cap)
-		new_cap = 2 * _capacity;
+	// if ( (_capacity << 1) > new_cap)
+		// new_cap = 2 * _capacity;
 	T* tmp = (allocate_capacity(new_cap));
 	iterator first = begin();
 	iterator last = end();
@@ -425,6 +447,7 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::insert( const_iter
 	if ( ( _tab && !pos ) || ( !_tab && pos ) || !count)
 		return const_cast<iterator>(pos);
 	size_type idx = !pos ? 0 : static_cast< size_type >( pos - begin() );
+	len_check(count);
 	shift(idx, count);
 	for (size_type i = 0; i < count; ++i)
 		_tab[idx + i] = value;
@@ -443,6 +466,7 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::insert(
 		return const_cast<iterator>(pos);
 	size_type count = static_cast<size_type>(last - first);
 	size_type idx = !pos ? 0 : static_cast< size_type >( pos - begin() );
+	len_check(count);
 	shift(idx, count);
 	for (InputIt it = first; it != last; ++it)
 		_tab[idx + (it - first)] = *it;
@@ -491,7 +515,7 @@ typename vector<T, Allocator>::iterator vector<T, Allocator>::erase( iterator fi
 template< typename T, typename Allocator >
 void vector<T, Allocator>::push_back( const T& value )
 {
-	reserve(_size + 1);
+	len_check(1);
 	_tab[_size++] = value;
 }
 
@@ -507,7 +531,8 @@ void vector<T, Allocator>::pop_back()
 template< typename T, typename Allocator >
 void vector<T, Allocator>::resize( size_type count, T value )
 {
-	reserve(count);
+	if (count > _size)
+		len_check(count - _size);
 	if (_size < count)
 	{
 		for (size_type i = _size; i < count; ++i)
@@ -589,7 +614,7 @@ void vector<T, Allocator>::destroy_tab_elements( void )
 template< typename T, typename Allocator >
 void	vector< T, Allocator >::shift(size_type idx, size_type count)
 {
-	reserve(_size + count);
+	// reserve(_size + count);
 	size_type i = end() - begin();
 	for ( ; i > idx; --i )
 		_tab[i + count - 1] = _tab[i - 1];
@@ -610,6 +635,17 @@ std::string vector<T, Allocator>::out_of_range_string( size_type pos ) const
 	if (ret < 0)
 		return std::string("Out of range exception");
 	return buffer;
+}
+
+template< typename T, typename Allocator >
+void vector<T, Allocator>::len_check( size_type n )
+{
+	if (max_size() - _size < n)
+		throw (std::length_error("vector::len_check"));
+	if (_size + n <= _capacity || !n)
+		return;
+	size_type len = _size + ( (_size > n) ? _size : n );
+	reserve( (len < _size || len > max_size()) ? max_size() : len );
 }
 
 } // namespace ft
