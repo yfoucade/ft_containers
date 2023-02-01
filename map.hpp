@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/01/30 10:50:46 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/01 23:03:33 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -379,7 +379,7 @@ void map<Key, T, Compare, Allocator>::insert( InputIt first, InputIt last )
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::erase( iterator pos )
 {
-	erase_node(pos->get_node());
+	erase_node(pos.get_node());
 	// if (!pos->get_parent())
 	// 	*_bst = pos->remove();
 	// else
@@ -392,7 +392,7 @@ void map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
 {
 	while (first != last)
 	{
-		erase_node(first++->get_node());
+		erase_node(first++.get_node());
 		// --_size;
 	}
 }
@@ -449,7 +449,7 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::count( const Key& key ) const
 {
-	if ( (*_bst)->find(key) )
+	if ( (*_bst)->search(key) )
 		return 1;
 	return 0;
 }
@@ -473,14 +473,14 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 ft::pair< typename map<Key, T, Compare, Allocator>::iterator, typename map<Key, T, Compare, Allocator>::iterator>
 map<Key, T, Compare, Allocator>::equal_range( const Key& key )
 {
-	return ft::pair<iterator, iterator>(lower_bound(), upper_bound());
+	return ft::pair<iterator, iterator>(lower_bound(key), upper_bound(key));
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 ft::pair< typename map<Key, T, Compare, Allocator>::const_iterator, typename map<Key, T, Compare, Allocator>::const_iterator >
 map<Key, T, Compare, Allocator>::equal_range( const Key& key ) const
 {
-	return ft::pair<const_iterator, const_iterator>(lower_bound(), upper_bound());
+	return ft::pair<const_iterator, const_iterator>(lower_bound(key), upper_bound(key));
 }
 
 
@@ -489,7 +489,7 @@ typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::lower_bound( const Key& key )
 {
 	iterator ret = end();
-	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
 	while ( tmp )
 	{
 		if ( _comp(tmp->get_value()->first, key) )
@@ -511,7 +511,7 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::lower_bound( const Key& key ) const
 {
 	const_iterator ret = end();
-	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
 	while ( tmp )
 	{
 		if ( _comp(tmp->get_value()->first, key) )
@@ -533,7 +533,7 @@ typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::upper_bound( const Key& key )
 {
 	iterator ret = end();
-	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
 	while ( tmp )
 	{
 		if ( _comp(key, tmp->get_value()->first) )
@@ -553,7 +553,7 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::upper_bound( const Key& key ) const
 {
 	const_iterator ret = end();
-	map<Key, T, Compare, Allocator>* tmp = *_bst;
+	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
 	while ( tmp )
 	{
 		if ( _comp(key, tmp->get_value()->first) )
