@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 15:34:16 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/02 12:13:49 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <memory>
 #include <cstdio>
 #include <cstring>
+#include <stdexcept>
 #include <string>
 #include "iterator.hpp"
 #include "enable_if.hpp"
