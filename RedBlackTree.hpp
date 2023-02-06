@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 01:12:40 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/06 04:00:14 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/06 04:03:51 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #define RED 0
 #define BLACK 1
-#include "BSTIterator.hpp"
+#include "RBTIterator.hpp"
 
 namespace ft
 {
@@ -41,8 +41,8 @@ public:
 	typedef value_type& value_reference;
 	typedef value_type& indirection_type;
 	typedef value_type* member_of_pointer_type;
-	typedef BSTIterator< RedBlackTree<Key, T, Compare>, value_type > iterator;
-	typedef BSTIterator< RedBlackTree<Key, T, Compare>, const value_type > const_iterator;
+	typedef RBTIterator< RedBlackTree<Key, T, Compare>, value_type > iterator;
+	typedef RBTIterator< RedBlackTree<Key, T, Compare>, const value_type > const_iterator;
 
 private:
 	node_type* _nil;
