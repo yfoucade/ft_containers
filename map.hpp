@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/07 03:59:43 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/07 12:58:50 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,14 @@ template<
 	typename Allocator = std::allocator<ft::pair<const Key, T> >
 > class map{
 	// member types
+	private:
+		typedef RedBlackTree<Key, ft::pair<const Key, T>, Compare> data_struct;
+		typedef typename RedBlackTree<Key, ft::pair<const Key, T>, Compare>::node_type node_type;
+
 	public:
 		typedef Key key_type;
 		typedef T mapped_type;
 		typedef ft::pair<const Key, T> value_type;
-		typedef RedBlackTree<Key, value_type, Compare> data_struct;
-		typedef typename RedBlackTree<Key, value_type, Compare>::node_type node_type;
 		typedef std::size_t size_type;
 		typedef std::ptrdiff_t difference_type;
 		typedef Compare key_compare;
