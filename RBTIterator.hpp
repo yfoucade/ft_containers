@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/14 14:08:44 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/06 04:12:04 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/06 21:50:00 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ template<
 		typedef T* member_of_pointer_type;
 
 	private:
-		RBT** _rbt;
+		RBT* _rbt;
 		node_type* _curr;
 
 	public:
 		RBTIterator( void );
-		RBTIterator( RBT** root, node_type* curr = NULL );
+		RBTIterator( RBT* root, node_type* curr = NULL );
 		RBTIterator( const RBTIterator& other );
 		RBTIterator& operator=( const RBTIterator& other );
 		void operator=( node_type* new_curr );
@@ -70,8 +70,8 @@ RBTIterator< RBT, T >::RBTIterator( void ):
 _rbt(NULL), _curr(NULL){}
 
 template< typename RBT, typename T >
-RBTIterator< RBT, T >::RBTIterator( RBT** root, node_type* curr ):
-_rbt(root), _curr(curr){}
+RBTIterator< RBT, T >::RBTIterator( RBT* rbt, node_type* curr ):
+_rbt(rbt), _curr(curr){}
 
 template< typename RBT, typename T >
 RBTIterator< RBT, T >::RBTIterator( const RBTIterator& other ):
@@ -117,7 +117,7 @@ RBTIterator< RBT, T >&
 RBTIterator< RBT, T >::operator++( void )
 {
 	if (_curr)
-		_curr = (*_rbt)->successor(_curr);
+		_curr = _rbt->successor(_curr);
 	return *this;
 }
 
@@ -137,10 +137,10 @@ RBTIterator< RBT, T >::operator--( void )
 	node_type* tmp;
 
 	if (!_curr)
-		_curr = (*_rbt)->maximum();
+		_curr = _rbt->maximum();
 	else
 	{
-		tmp = (*_rbt)->predecessor(_curr);
+		tmp = _rbt->predecessor(_curr);
 		if (tmp)
 			_curr = tmp;
 	}
