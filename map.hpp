@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/01 23:45:53 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/07 03:59:43 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <memory>
 #include <stdexcept>
 #include "lexicographical_compare.hpp"
-#include "BinarySearchTree.hpp"
+#include "RedBlackTree.hpp"
 #include "iterator.hpp"
 #include "pair.hpp"
 
@@ -38,6 +38,8 @@ template<
 		typedef Key key_type;
 		typedef T mapped_type;
 		typedef ft::pair<const Key, T> value_type;
+		typedef RedBlackTree<Key, value_type, Compare> data_struct;
+		typedef typename RedBlackTree<Key, value_type, Compare>::node_type node_type;
 		typedef std::size_t size_type;
 		typedef std::ptrdiff_t difference_type;
 		typedef Compare key_compare;
@@ -46,21 +48,23 @@ template<
 		typedef const value_type& const_reference;
 		typedef typename Allocator::pointer pointer;
 		typedef typename Allocator::const_pointer const_pointer;
-		typedef typename BinarySearchTree<Key, value_type, Compare>::iterator iterator;
-		typedef typename BinarySearchTree<Key, value_type, Compare>::const_iterator const_iterator;
+		typedef typename data_struct::iterator iterator;
+		typedef typename data_struct::const_iterator const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	// private members
 	private:
-		BinarySearchTree<Key, value_type, Compare>** _bst;
+		// now _rbt won't change during lifetime of map instance.
+		// no need for pointer to pointer. just a pointer.
+		data_struct *_rbt;
 		key_compare _comp;
 		allocator_type _alloc;
 		size_type _size;
 		size_type _required_alloc_size;
-		void destroy_tree(BinarySearchTree<Key, value_type, Compare>* bst);
+		void destroy_tree();
 		size_type compute_ras( void );
-		size_type erase_node( BinarySearchTree<Key, value_type, Compare>* );
+		size_type erase_node( node_type* );
 
 	// member classes
 	public:
@@ -147,52 +151,53 @@ map<Key, T, Compare, Allocator>::value_compare::operator()(
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::map( void ):
-_bst(new BinarySearchTree<Key, value_type, Compare>*), _size(0),
+_rbt(new data_struct),
+_size(0),
 _required_alloc_size(compute_ras())
-{ *_bst = NULL; }
+{}
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::map( const Compare& comp, const Allocator& alloc ):
-_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(comp), _alloc(alloc),
+_rbt(new data_struct), _comp(comp), _alloc(alloc),
 _size(0), _required_alloc_size(compute_ras())
-{ *_bst = NULL; }
+{}
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 template< typename InputIt >
 map<Key, T, Compare, Allocator>::map(
 	InputIt first, InputIt last, const Compare& comp, const Allocator& alloc ):
-_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(comp), _alloc(alloc),
+_rbt(new data_struct), _comp(comp), _alloc(alloc),
 _size(0), _required_alloc_size(compute_ras())
 {
-	*_bst = NULL;
 	insert(first, last);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::map( const map& other ):
-_bst(new BinarySearchTree<Key, value_type, Compare>*), _comp(other._comp), _alloc(other._alloc), _size(0)
+_rbt(new data_struct), _comp(other._comp), _alloc(other._alloc), _size(0)
 {
-	*_bst = NULL;
 	*this = other;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 map<Key, T, Compare, Allocator>::~map( void )
 {
-	destroy_tree(*_bst);
-	*_bst = NULL;
-	delete _bst;
+	destroy_tree();
+	delete _rbt;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 void
-map<Key, T, Compare, Allocator>::destroy_tree( BinarySearchTree<Key, value_type, Compare>* bst )
+map<Key, T, Compare, Allocator>::destroy_tree()
 {
-	if (bst)
+	node_type* tmp;
+	if (!_rbt)
+		return;
+	// while (_rbt->get_root() != _rbt->get_nil())
+	while (_size)
 	{
-		destroy_tree(bst->get_left());
-		destroy_tree(bst->get_right());
-		erase_node(bst);
+		tmp = _rbt->get_root();
+		erase_node(tmp);
 	}
 }
 
@@ -202,7 +207,7 @@ map<Key, T, Compare, Allocator>::operator=( const map& other )
 {
 	if (this == &other)
 		return *this;
-	destroy_tree(*_bst);
+	destroy_tree();
 	_comp = other._comp;
 	_alloc = other._alloc;
 	_size = 0;
@@ -226,23 +231,19 @@ map<Key, T, Compare, Allocator>::get_allocator( void ) const
 template< typename Key, typename T, typename Compare, typename Allocator >
 T& map<Key, T, Compare, Allocator>::at( const Key& key )
 {
-	if (!*_bst)
-		throw std::out_of_range("map::at");
-	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->search(key);
+	node_type* res = _rbt->search(key);
 	if (!res)
 		throw std::out_of_range("map::at");
-	return res->get_value()->second;
+	return res->value->second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 const T& map<Key, T, Compare, Allocator>::at( const Key& key ) const
 {
-	if (!*_bst)
-		throw std::out_of_range("map::at");
-	BinarySearchTree<Key, value_type, Compare>* res = (*_bst)->search(key);
+	node_type* res = _rbt->search(key);
 	if (!res)
 		throw std::out_of_range("map::at");
-	return res->get_value()->second;
+	return res->value->second;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -257,32 +258,28 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::begin( void )
 {
-	if (*_bst)
-		return iterator(_bst, (*_bst)->minimum());
-	return iterator(_bst);
+	return iterator(_rbt, _rbt->minimum());
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::begin( void ) const
 {
-	if (*_bst)
-		return const_iterator(_bst, (*_bst)->minimum());
-	return const_iterator(_bst);
+	return const_iterator(_rbt, _rbt->minimum());
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::end( void )
 {
-	return iterator(_bst);
+	return iterator(_rbt);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::end( void ) const
 {
-	return const_iterator(_bst);
+	return const_iterator(_rbt);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -330,14 +327,13 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::max_size() const
 {
-	return std::numeric_limits<difference_type>::max() / sizeof(BinarySearchTree<Key, value_type, Compare>);
+	return std::numeric_limits<difference_type>::max() / sizeof(data_struct);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::clear( void )
 {
-	destroy_tree(*_bst);
-	*_bst = NULL;
+	destroy_tree();
 	_size = 0;
 }
 
@@ -347,17 +343,16 @@ map<Key, T, Compare, Allocator>::insert( const value_type& value )
 {
 	iterator it = find(value.first);
 	if (it != end())
+	{
 		return ft::pair<iterator, bool>(it, false);
+	}
 	value_type* new_value = reinterpret_cast<value_type*>(_alloc.allocate(_required_alloc_size));
 	// _alloc.construct(new_value, value);
 	new((void *)new_value) value_type(value);
-	BinarySearchTree<Key, value_type, Compare>* node = new BinarySearchTree<Key, value_type, Compare>(new_value);
-	if (!*_bst)
-		*_bst = node;
-	else
-		(*_bst)->insert(node);
+	node_type* node = new node_type(RED, value.first, new_value, NULL, NULL, NULL);
+	_rbt->insert(node);
 	++_size;
-	return ft::pair<iterator, bool>(iterator(_bst, node), true);
+	return ft::pair<iterator, bool>(iterator(_rbt, node), true);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -381,11 +376,6 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::erase( iterator pos )
 {
 	erase_node(pos.get_node());
-	// if (!pos->get_parent())
-	// 	*_bst = pos->remove();
-	// else
-	// 	pos->remove();
-	// --_size;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
@@ -402,23 +392,19 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::erase( const Key& key )
 {
-	BinarySearchTree<Key, value_type, Compare>* node = (*_bst)->search(key);
+	node_type* node = _rbt->search(key);
 	return erase_node(node);
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
-map<Key, T, Compare, Allocator>::erase_node(
-	BinarySearchTree<Key, value_type, Compare>* node )
+map<Key, T, Compare, Allocator>::erase_node( node_type* node )
 {
 	if (!node)
 		return 0;
-	if (!node->get_parent())
-		*_bst = node->remove();
-	else
-		node->remove();
-	node->get_value()->~value_type();
-	_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(node->get_value()), _required_alloc_size);
+	_rbt->remove(node);
+	node->value->~value_type();
+	_alloc.deallocate(reinterpret_cast<typename Allocator::pointer>(node->value), _required_alloc_size);
 	delete node;
 	--_size;
 	return 1;
@@ -427,19 +413,19 @@ map<Key, T, Compare, Allocator>::erase_node(
 template< typename Key, typename T, typename Compare, typename Allocator >
 void map<Key, T, Compare, Allocator>::swap( map& other )
 {
-	BinarySearchTree<Key, value_type, Compare>** tmp_bst = _bst;
+	data_struct* tmp_rbt = _rbt;
 	key_compare tmp_comp = _comp;
 	allocator_type tmp_alloc = _alloc;
 	size_type tmp_size = _size;
 	size_type tmp_required_alloc_size = _required_alloc_size;
 	
-	_bst = other._bst;
+	_rbt = other._rbt;
 	_comp = other._comp;
 	_alloc = other._alloc;
 	_size = other._size;
 	_required_alloc_size = other._required_alloc_size;
 
-	other._bst = tmp_bst;
+	other._rbt = tmp_rbt;
 	other._comp = tmp_comp;
 	other._alloc = tmp_alloc;
 	other._size = tmp_size;
@@ -450,7 +436,7 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::size_type
 map<Key, T, Compare, Allocator>::count( const Key& key ) const
 {
-	if ( (*_bst)->search(key) )
+	if ( _rbt->search(key) )
 		return 1;
 	return 0;
 }
@@ -459,14 +445,14 @@ template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::find( const Key& key )
 {
-	return iterator(_bst, (*_bst)->search(key) );
+	return iterator(_rbt, _rbt->search(key) );
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
 typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::find( const Key& key ) const
 {
-	return const_iterator(_bst, (*_bst)->search(key) );
+	return const_iterator(_rbt, _rbt->search(key) );
 }
 
 
@@ -490,19 +476,19 @@ typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::lower_bound( const Key& key )
 {
 	iterator ret = end();
-	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
-	while ( tmp )
+	node_type* tmp = _rbt->get_root();
+	while ( tmp != _rbt->get_nil() )
 	{
-		if ( _comp(tmp->get_value()->first, key) )
-			tmp = tmp->get_right();
-		else if ( _comp(key, tmp->get_value()->first) )
+		if ( _comp(tmp->value->first, key) )
+			tmp = tmp->right;
+		else if ( _comp(key, tmp->value->first) )
 		{
-			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
-				ret = iterator(_bst, tmp);
-			tmp = tmp->get_left();
+			if ( ret == end() || _comp(tmp->value->first, ret->first) )
+				ret = iterator(_rbt, tmp);
+			tmp = tmp->left;
 		}
 		else
-			return iterator(_bst, tmp);
+			return iterator(_rbt, tmp);
 	}
 	return ret;
 }
@@ -512,19 +498,19 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::lower_bound( const Key& key ) const
 {
 	const_iterator ret = end();
-	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
-	while ( tmp )
+	node_type* tmp = _rbt->get_root();
+	while ( tmp != _rbt->get_nil() )
 	{
-		if ( _comp(tmp->get_value()->first, key) )
-			tmp = tmp->get_right();
-		else if ( _comp(key, tmp->get_value()->first) )
+		if ( _comp(tmp->value->first, key) )
+			tmp = tmp->right;
+		else if ( _comp(key, tmp->value->first) )
 		{
-			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
-				ret = const_iterator(_bst, tmp);
-			tmp = tmp->get_left();
+			if ( ret == end() || _comp(tmp->value->first, ret->first) )
+				ret = const_iterator(_rbt, tmp);
+			tmp = tmp->left;
 		}
 		else
-			return const_iterator(_bst, tmp);
+			return const_iterator(_rbt, tmp);
 	}
 	return ret;
 }
@@ -534,17 +520,17 @@ typename map<Key, T, Compare, Allocator>::iterator
 map<Key, T, Compare, Allocator>::upper_bound( const Key& key )
 {
 	iterator ret = end();
-	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
-	while ( tmp )
+	node_type* tmp = _rbt->get_root();
+	while ( tmp != _rbt->get_nil() )
 	{
-		if ( _comp(key, tmp->get_value()->first) )
+		if ( _comp(key, tmp->value->first) )
 		{
-			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
-				ret = iterator(_bst, tmp);
-			tmp = tmp->get_left();
+			if ( ret == end() || _comp(tmp->value->first, ret->first) )
+				ret = iterator(_rbt, tmp);
+			tmp = tmp->left;
 		}
 		else
-			tmp = tmp->get_right();
+			tmp = tmp->right;
 	}
 	return ret;
 }
@@ -554,17 +540,17 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::upper_bound( const Key& key ) const
 {
 	const_iterator ret = end();
-	BinarySearchTree<Key, value_type, Compare>* tmp = *_bst;
-	while ( tmp )
+	node_type* tmp = _rbt->get_root();
+	while ( tmp != _rbt->get_nil() )
 	{
-		if ( _comp(key, tmp->get_value()->first) )
+		if ( _comp(key, tmp->value->first) )
 		{
-			if ( ret == end() || _comp(tmp->get_value()->first, ret->first) )
-				ret = const_iterator(_bst, tmp);
-			tmp = tmp->get_left();
+			if ( ret == end() || _comp(tmp->value->first, ret->first) )
+				ret = const_iterator(_rbt, tmp);
+			tmp = tmp->left;
 		}
 		else
-			tmp = tmp->get_right();
+			tmp = tmp->right;
 	}
 	return ret;
 }
