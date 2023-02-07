@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/07 12:58:50 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/07 14:29:59 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,8 +118,8 @@ template<
 		iterator insert( iterator pos, const value_type& value );
 		template< class InputIt >
 		void insert( InputIt first, InputIt last );
-		void erase( iterator pos );
-		void erase( iterator first, iterator last );
+		iterator erase( iterator pos );
+		iterator erase( iterator first, iterator last );
 		size_type erase( const Key& key );
 		void swap( map& other );
 		// lookup
@@ -375,19 +375,23 @@ void map<Key, T, Compare, Allocator>::insert( InputIt first, InputIt last )
 
 
 template< typename Key, typename T, typename Compare, typename Allocator >
-void map<Key, T, Compare, Allocator>::erase( iterator pos )
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::erase( iterator pos )
 {
+	iterator ret = pos;
+
+	++ret;
 	erase_node(pos.get_node());
+	return ret;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
-void map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::erase( iterator first, iterator last )
 {
 	while (first != last)
-	{
 		erase_node(first++.get_node());
-		// --_size;
-	}
+	return last;
 }
 
 template< typename Key, typename T, typename Compare, typename Allocator >
