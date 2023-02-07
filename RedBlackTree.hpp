@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/06 01:12:40 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/06 04:03:51 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/07 03:57:18 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,16 @@
 namespace ft
 {
 
-template< typename Key, typename T, typename Compare >
+template< typename Key, typename T >
 struct RBNode
 {
 	bool color;
-	Key key;
+	const Key key;
 	T* value;
 	RBNode *parent;
 	RBNode *left;
 	RBNode *right;
+	RBNode( bool, Key, T*, RBNode*, RBNode*, RBNode* );
 };
 
 template< typename Key, typename T, typename Compare >
@@ -36,7 +37,7 @@ class RedBlackTree
 public:
 	typedef Key key_type;
 	typedef T value_type;
-	typedef RBNode<Key, T, Compare> node_type;
+	typedef RBNode<Key, T> node_type;
 	typedef value_type* value_pointer;
 	typedef value_type& value_reference;
 	typedef value_type& indirection_type;
@@ -49,7 +50,6 @@ private:
 	node_type* _root;
 	Compare key_compare;
 	RedBlackTree( const RedBlackTree& other );
-	RedBlackTree& operator=( const RedBlackTree& other );
 	void right_rotate( node_type* node );
 	void left_rotate( node_type* node );
 	void insert_fixup( node_type* z );
@@ -58,8 +58,9 @@ private:
 public:
 	RedBlackTree( void );
 	RedBlackTree( node_type* node );
+	RedBlackTree& operator=( const RedBlackTree& other );
 	~RedBlackTree();
-	node_type* search( const Key& key ) const;
+	node_type* search( const Key& key );
 	node_type* get_root( void ) const;
 	node_type* get_nil( void ) const;
 	node_type* minimum( void ) const;
@@ -73,6 +74,11 @@ public:
 	void remove( node_type* node );
 };
 
+template< typename Key, typename T >
+RBNode<Key, T>::RBNode( bool c, Key k, T* v, RBNode* p, RBNode* l , RBNode* r ):
+color(c), key(k), value(v), parent(p), left(l), right(r)
+{}
+
 template< typename Key, typename T, typename Compare >
 RedBlackTree<Key, T, Compare>::RedBlackTree( void ):
 _nil(NULL), _root(NULL)
@@ -85,6 +91,26 @@ _root(node)
 {}
 
 template< typename Key, typename T, typename Compare >
+RedBlackTree<Key, T, Compare>::RedBlackTree( const RedBlackTree& other ):
+_nil(NULL), _root(NULL)
+{
+	*this = other;
+}
+
+template< typename Key, typename T, typename Compare >
+RedBlackTree<Key, T, Compare>&
+RedBlackTree<Key, T, Compare>::operator=( const RedBlackTree& other )
+{
+	if ( this == &other )
+		return *this;
+	if ( !_nil && other._nil)
+		_nil = new node_type(BLACK, other->_nil->key, NULL, NULL, NULL);
+	_root = other._root;
+	key_compare = other.key_compare;
+	return *this;
+}
+
+template< typename Key, typename T, typename Compare >
 RedBlackTree<Key, T, Compare>::~RedBlackTree( void )
 {
 	delete(_nil);
@@ -92,9 +118,10 @@ RedBlackTree<Key, T, Compare>::~RedBlackTree( void )
 
 template< typename Key, typename T, typename Compare >
 typename RedBlackTree<Key, T, Compare>::node_type*
-RedBlackTree<Key, T, Compare>::search( const Key& key ) const
+RedBlackTree<Key, T, Compare>::search( const Key& key )
 {
 	node_type* res = _root;
+
 	while ( res != _nil )
 	{
 		if (key_compare(key, res->key))
@@ -217,6 +244,13 @@ RedBlackTree<Key, T, Compare>::insert( node_type* node )
 	node_type* trailing = _nil;
 	node_type* leading = _root;
 
+	if (!_nil)
+	{
+		_nil = new node_type(BLACK, node->key, NULL, NULL, NULL, NULL);
+		_root = _nil;
+	}
+	trailing = _nil;
+	leading = _root;
 	while (leading != _nil)
 	{
 		trailing = leading;
@@ -259,6 +293,7 @@ RedBlackTree<Key, T, Compare>::remove( node_type* z )
 	else
 	{
 		y = minimum(z->right);
+		y_original_color = y->color;
 		x = y->right;
 		if (y->parent == z)
 			x->parent = y;
