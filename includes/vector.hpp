@@ -6,11 +6,13 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/02 12:13:49 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/08 14:19:50 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+
+#ifndef FT_VECTOR
+# define FT_VECTOR
 
 #include <limits>
 #include <memory>
@@ -712,3 +714,5 @@ void swap(	ft::vector<T,Alloc>& lhs,
 }
 
 } // namespace ft
+
+#endif // FT_VECTOR
