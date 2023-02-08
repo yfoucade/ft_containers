@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/17 19:27:11 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/07 14:29:59 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/08 14:29:50 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,6 @@
 #include "iterator.hpp"
 #include "pair.hpp"
 
-// store a pointer to the root (BST** _root), and share its address with the iterator.
-// This way a past-the-end iterator (because tree is empty), can be decremented after
-// tree has been grown.
 namespace ft
 {
 
@@ -57,8 +54,6 @@ template<
 
 	// private members
 	private:
-		// now _rbt won't change during lifetime of map instance.
-		// no need for pointer to pointer. just a pointer.
 		data_struct *_rbt;
 		key_compare _comp;
 		allocator_type _alloc;
@@ -195,7 +190,6 @@ map<Key, T, Compare, Allocator>::destroy_tree()
 	node_type* tmp;
 	if (!_rbt)
 		return;
-	// while (_rbt->get_root() != _rbt->get_nil())
 	while (_size)
 	{
 		tmp = _rbt->get_root();
@@ -349,7 +343,6 @@ map<Key, T, Compare, Allocator>::insert( const value_type& value )
 		return ft::pair<iterator, bool>(it, false);
 	}
 	value_type* new_value = reinterpret_cast<value_type*>(_alloc.allocate(_required_alloc_size));
-	// _alloc.construct(new_value, value);
 	new((void *)new_value) value_type(value);
 	node_type* node = new node_type(RED, value.first, new_value, NULL, NULL, NULL);
 	_rbt->insert(node);
