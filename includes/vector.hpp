@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/26 11:25:25 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/08 14:19:50 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/08 14:34:03 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -412,9 +412,6 @@ void vector<T, Allocator>::reserve( size_type new_cap )
 		throw (std::length_error("vector::reserve"));
 	if (new_cap <= _capacity)
 		return;
-	// new_cap = (new_cap >= (max_size() >> 1) ? max_size() : 2 * new_cap);
-	// if ( (_capacity << 1) > new_cap)
-		// new_cap = 2 * _capacity;
 	T* tmp = (allocate_capacity(new_cap));
 	iterator first = begin();
 	iterator last = end();
@@ -617,7 +614,6 @@ void vector<T, Allocator>::destroy_tab_elements( void )
 template< typename T, typename Allocator >
 void	vector< T, Allocator >::shift(size_type idx, size_type count)
 {
-	// reserve(_size + count);
 	size_type i = end() - begin();
 	for ( ; i > idx; --i )
 		_tab[i + count - 1] = _tab[i - 1];
