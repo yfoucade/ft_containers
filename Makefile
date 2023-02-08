@@ -25,10 +25,10 @@ ft_container: ft_main.o
 	${CXX} ${CXXFLAGS} -o ft_container ft_main.o
 
 ft_main.o: main.cpp
-	${CXX} ${CXXFLAGS} ${MMD} -c -DFT -o $@ main.cpp
+	${CXX} ${CXXFLAGS} ${MMD} -c -DFT -Iincludes -o $@ main.cpp
 
 std_main.o: main.cpp
-	${CXX} ${CXXFLAGS} ${MMD} -c -DSTD -o $@ main.cpp
+	${CXX} ${CXXFLAGS} ${MMD} -c -DSTD -Iincludes -o $@ main.cpp
 
 test: ${NAME}
 	./ft_container ${SEED} > out_ft.out
@@ -40,6 +40,8 @@ clean:
 
 fclean: clean
 	${RM} ${NAME}
+	${RM} ft_container std_container
+	${RM} out_ft.out out_std.out
 
 re: fclean all
 

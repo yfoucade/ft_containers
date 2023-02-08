@@ -6,7 +6,7 @@
 /*   By: yfoucade <yfoucade@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 21:02:52 by yfoucade          #+#    #+#             */
-/*   Updated: 2023/02/08 00:41:05 by yfoucade         ###   ########.fr       */
+/*   Updated: 2023/02/08 11:46:40 by yfoucade         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 #include "tests.hpp"
 #include <stdlib.h>
 
-#define MAX_RAM 4294967296
+#define MAX_RAM 2147483648
 #define BUFFER_SIZE 4096
 struct Buffer
 {
